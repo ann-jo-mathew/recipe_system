@@ -12,4 +12,10 @@ class Recipe(models.Model):
     def __str__(self):
         return self.recipe_name
 
+class Ingredient(models.Model):
+    ingredient_name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.ingredient_name
+
 

@@ -18,4 +18,16 @@ class Ingredient(models.Model):
     def __str__(self):
         return self.ingredient_name
 
+class RecipeIngredient(models.Model):
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
+    measure = models.CharField(max_length=50, default="Enter measurement") 
 
+class Instruction(models.Model):
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    step_no = models.IntegerField()
+    description = models.TextField()
+    image = models.ImageField(upload_to='instruction_images/', null=True, blank=True)
+
+    def __str__(self):
+        return f"Step {self.step_no} for {self.recipe.recipe_name}"

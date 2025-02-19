@@ -21,7 +21,11 @@ class Ingredient(models.Model):
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
-    measure = models.CharField(max_length=50, default="Enter measurement") 
+    measure = models.CharField(max_length=50, default="Enter measurement")
+
+    def __str__(self):
+        return self.ingredient
+
 
 class Instruction(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)

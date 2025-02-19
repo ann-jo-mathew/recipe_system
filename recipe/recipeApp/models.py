@@ -35,3 +35,10 @@ class Instruction(models.Model):
 
     def __str__(self):
         return f"Step {self.step_no} for {self.recipe.recipe_name}"
+
+class Favorite(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user.username} favorited {self.recipe.recipe_name}"

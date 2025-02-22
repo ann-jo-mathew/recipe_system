@@ -2,4 +2,5 @@ from django.shortcuts import render, redirect
 
 # Create your views here.
 def index(request):
+    # Food.objects
     return render(request, 'recipeApp/index.html')

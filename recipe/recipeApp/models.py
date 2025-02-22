@@ -1,9 +1,19 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.utils.timezone import now
 
 # Create your models here.
-class Recipe(models.Model):
+
+# Common Timestamp Model
+class Timestamp(models.Model):
+    created_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True  # This ensures it doesn't create a separate table in the database
+
+
+class Recipe(Timestamp):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     recipe_name = models.CharField(max_length=255)
     image = models.ImageField(upload_to='recipe_images/', null=True, blank=True)
@@ -13,13 +23,13 @@ class Recipe(models.Model):
     def __str__(self):
         return self.recipe_name
 
-class Ingredient(models.Model):
+class Ingredient(Timestamp):
     ingredient_name = models.CharField(max_length=255)
 
     def __str__(self):
         return self.ingredient_name
 
-class RecipeIngredient(models.Model):
+class RecipeIngredient(Timestamp):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     measure = models.CharField(max_length=50, default="Enter measurement")
@@ -28,7 +38,7 @@ class RecipeIngredient(models.Model):
         return self.ingredient.ingredient_name
 
 
-class Instruction(models.Model):
+class Instruction(Timestamp):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     step_no = models.IntegerField()
     description = models.TextField()
@@ -37,14 +47,14 @@ class Instruction(models.Model):
     def __str__(self):
         return f"Step {self.step_no} for {self.recipe.recipe_name}"
 
-class Favorite(models.Model):
+class Favorite(Timestamp):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.user.username} favorited {self.recipe.recipe_name}"
     
-class Rating(models.Model):
+class Rating(Timestamp):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     rating = models.IntegerField()  # Example: 1-5 stars

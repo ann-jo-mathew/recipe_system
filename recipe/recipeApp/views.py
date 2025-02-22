@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
+from .models import Recipe
 
-# Create your views here.
 def index(request):
-    # Food.objects
+    recipes = Recipe.objects.all()  # Fetch all recipes
     return render(request, 'recipeApp/index.html')

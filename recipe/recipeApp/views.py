@@ -24,9 +24,6 @@ def contact(request):
 def elements(request):
     return render(request, 'recipeApp/elements.html')
  """
-def demo(request):
-    recipes = Recipe.objects.all()  # Fetch all recipes
-    return render(request, 'recipeApp/demo.html',{'recipes':recipes})
 
 """ def latest_recipes(request):
     latest_recipes = Recipe.objects.order_by('-created_at')[:6]  # Fetch latest 6 recipes

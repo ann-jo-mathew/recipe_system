@@ -89,36 +89,7 @@
     <!-- ##### Hero Area End ##### -->
 
     <!-- ##### Top Catagory Area Start ##### -->
-    <section class="top-catagory-area section-padding-80-0">
-        <div class="container">
-            <div class="row">
-                <!-- Top Catagory Area -->
-                <div class="col-12 col-lg-6">
-                    <div class="single-top-catagory">
-                        <img src="{% static 'recipeApp/img/bg-img/bg2.jpg' %}" alt="">
-                        <!-- Content -->
-                        <div class="top-cta-content">
-                            <h3>Strawberry Cake</h3>
-                            <h6>Simple &amp; Delicios</h6>
-                            <a href="receipe-post.html" class="btn delicious-btn">See Full Receipe</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- Top Catagory Area -->
-                <div class="col-12 col-lg-6">
-                    <div class="single-top-catagory">
-                        <img src="{% static 'recipeApp/img/bg-img/bg3.jpg' %}" alt="">
-                        <!-- Content -->
-                        <div class="top-cta-content">
-                            <h3>Chinesse Noodles</h3>
-                            <h6>Simple &amp; Delicios</h6>
-                            <a href="receipe-post.html" class="btn delicious-btn">See Full Receipe</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    
     <!-- ##### Top Catagory Area End ##### -->
 
     <!-- ##### Best Receipe Area Start ##### -->
@@ -140,6 +111,7 @@
                         {% for recipe in latest_recipes %}
                         <div class="col-12 col-sm-6 col-lg-4">
                             <div class="single-best-receipe-area mb-30">
+                            <!--{{recipe.image.url}}-->
                                 <img src="{{recipe.image.url}}" alt="{{ recipe.recipe_name }}">
                                 <div class="receipe-content">
                                     <a href="{% url 'recipe_detail' recipe_name=recipe.recipe_name %}"></a>

@@ -1,9 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Recipe
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import logout as auth_logout  # Rename to avoid conflict
 from django.contrib import messages
 import logging
+from django.contrib.auth.decorators import login_required
+
 
 logger = logging.getLogger(__name__)
 
@@ -62,14 +65,17 @@ def login_user(request):
 # Logout View
 def logout_user(request):
     auth_logout(request)
-    messages.success(request, "You have been logged out.")
-    return redirect('index')  # Redirect to homepage after logout
-
-
+    messages.success(request, "Thanks for spending some quality time with the website today. Log in again if needed.")
+    return redirect('index')  # Redirect to homepage
 # Index View
 def index(request):
     latest_recipes = Recipe.objects.order_by('-created_at')[:6]  # Fetch latest 6 recipes
-    return render(request, 'recipeApp/index.html', {'latest_recipes': latest_recipes})
+    context = {
+        'latest_recipes': latest_recipes,
+        'user': request.user  # Include the user object in the context
+    }
+    return render(request, 'recipeApp/index.html', context)
+
 """ def index(request):
     recipes = Recipe.objects.all()  # Fetch all recipes
     return render(request, 'recipeApp/index.html')
@@ -99,6 +105,9 @@ def recipe_detail(request, recipe_name):
     recipe = get_object_or_404(Recipe, recipe_name=recipe_name)
     return render(request, 'recipeApp/recipe_detail.html', {'recipe': recipe})
      """
+
+def passwordreset(request):
+    return render(request, 'recipeApp/passwordreset.html')
 
 def recipe_detail(request, recipe_name):
     recipe = get_object_or_404(Recipe, recipe_name=recipe_name)

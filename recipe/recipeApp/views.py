@@ -71,7 +71,7 @@ def login_user(request):
 
 @login_required
 def user_profile(request):
-    profile = UserProfile.objects.get(user=request.user)
+    profile, created = UserProfile.objects.get_or_create(user=request.user)  # Ensures profile exists
     
     if request.method == "POST":
         form = UserProfileForm(request.POST, request.FILES, instance=profile)
@@ -82,7 +82,8 @@ def user_profile(request):
     else:
         form = UserProfileForm(instance=profile)
 
-    return render(request, 'user_profile.html', {'profile': profile, 'form': form})
+    return render(request, 'recipeApp/user_profile.html', {'profile': profile, 'form': form})
+
 # Logout View
 def logout_user(request):
     auth_logout(request)
@@ -101,31 +102,32 @@ def index(request):
     recipes = Recipe.objects.all()  # Fetch all recipes
     return render(request, 'recipeApp/index.html')
      """
-""" def about(request):
-    return render(request, 'recipeApp/about.html')
 
-def blog_post(request):
+"""def blog_post(request):
     return render(request, 'recipeApp/blog-post.html')
 
 def recipe_post(request):
-    return render(request, 'recipeApp/recipe-post.html')
+    return render(request, 'recipeApp/recipe-post.html')"""
 
 def contact(request):
     return render(request, 'recipeApp/contact.html')
 
-def elements(request):
-    return render(request, 'recipeApp/elements.html')
- """
+"""def elements(request):
+    return render(request, 'recipeApp/elements.html')"""
+ 
 
 """ def latest_recipes(request):
     latest_recipes = Recipe.objects.order_by('-created_at')[:6]  # Fetch latest 6 recipes
     print(latest_recipes)  
-    return render(request, 'recipeApp/latest_recipes.html', {'latest_recipes': latest_recipes})
+    return render(request, 'recipeApp/latest_recipes.html', {'latest_recipes': latest_recipes})"""
 
-def recipe_detail(request, recipe_name):
+"""def recipe_detail(request, recipe_name):
     recipe = get_object_or_404(Recipe, recipe_name=recipe_name)
-    return render(request, 'recipeApp/recipe_detail.html', {'recipe': recipe})
-     """
+    return render(request, 'recipeApp/recipe_detail.html', {'recipe': recipe})  # ✅ Correct template"""
+
+def about(request):
+    return render(request, 'recipeApp/about.html')
+
 
 def passwordreset(request):
     return render(request, 'recipeApp/passwordreset.html')
@@ -137,3 +139,5 @@ def recipe_detail(request, recipe_name):
         'recipe': recipe,
         'latest_recipes': latest_recipes
     })
+def upload_recipe(request):
+    return render(request, 'recipeApp/upload_recipe.html')

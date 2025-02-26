@@ -12,6 +12,9 @@ urlpatterns = [
     path('logout/',views.logout_user, name='logout'),
     path('passwordreset/', views.passwordreset, name='password'),
     path('profile/', views.user_profile, name='user_profile'),
+    path('about/', views.about, name='about'),
+    path('upload/', views.upload_recipe, name='upload_recipe'),
+    path('contact/', views.contact, name='contact'),
 ]
 
 if settings.DEBUG:  # Only serve media files in development

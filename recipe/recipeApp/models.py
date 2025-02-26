@@ -51,6 +51,9 @@ class Favorite(Timestamp):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
 
+    class Meta:
+        unique_together = ('user', 'recipe')  # Prevent duplicate favorites
+
     def __str__(self):
         return f"{self.user.username} favorited {self.recipe.recipe_name}"
     

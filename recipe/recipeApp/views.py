@@ -9,6 +9,8 @@ from django.contrib.auth import get_user_model  # ✅ Add this import
 from django.contrib.auth.decorators import login_required
 from .models import UserProfile
 from .forms import UserProfileForm
+from .models import Recipe, RecipeIngredient, Instruction, Rating
+from django.db.models import Avg
 
 
 
@@ -121,9 +123,23 @@ def contact(request):
     print(latest_recipes)  
     return render(request, 'recipeApp/latest_recipes.html', {'latest_recipes': latest_recipes})"""
 
-"""def recipe_detail(request, recipe_name):
-    recipe = get_object_or_404(Recipe, recipe_name=recipe_name)
-    return render(request, 'recipeApp/recipe_detail.html', {'recipe': recipe})  # ✅ Correct template"""
+def search_recipe(request):
+    query = request.GET.get('q', '')  # Get the search query from the URL
+    recipes = Recipe.objects.filter(recipe_name__icontains=query)if query else []  # Case-insensitive search
+
+    for recipe in recipes:
+        # Fetch ingredients and instructions for each recipe
+        recipe.ingredients = RecipeIngredient.objects.filter(recipe=recipe)
+        recipe.instructions = Instruction.objects.filter(recipe=recipe).order_by('step_no')
+        ratings = Rating.objects.filter(recipe=recipe)
+
+        # Calculate average rating
+        if ratings.exists():
+            recipe.average_rating = sum(r.rating for r in ratings) / ratings.count()
+        else:
+            recipe.average_rating = 0  # Default to 0 if no ratings
+
+    return render(request, 'recipeApp/recipe-search-results.html', {'recipes': recipes, 'query': query})
 
 def about(request):
     return render(request, 'recipeApp/about.html')
@@ -134,10 +150,58 @@ def passwordreset(request):
 
 def recipe_detail(request, recipe_name):
     recipe = get_object_or_404(Recipe, recipe_name=recipe_name)
-    latest_recipes = Recipe.objects.order_by('-created_at')[:6]  # Fetch latest 6 recipes
-    return render(request, 'recipeApp/index.html', {
+    instructions = Instruction.objects.filter(recipe=recipe).order_by('step_no')
+    ingredients = RecipeIngredient.objects.filter(recipe=recipe)
+    
+    # Calculate average rating
+    average_rating = Rating.objects.filter(recipe=recipe).aggregate(Avg('rating'))['rating__avg'] or 0
+
+    return render(request, 'recipeApp/recipe_detail.html', {
         'recipe': recipe,
-        'latest_recipes': latest_recipes
+        'instructions': instructions,
+        'ingredients': ingredients,
+        'average_rating': average_rating
     })
+
+
+def recipe_comments(request, recipe_id):
+    recipe = get_object_or_404(Recipe, id=recipe_id)
+    comments = Rating.objects.filter(recipe=recipe)
+
+    if request.method == "POST":
+        rating = request.POST.get('rating')
+        comment_text = request.POST.get('comment')
+        
+        # Save Comment
+        if rating and comment_text:
+            Rating.objects.create(
+                user=request.user,
+                recipe=recipe,
+                rating=int(rating),
+                comment=comment_text
+            )
+
+    return render(request, 'recipeApp/recipe-comments.html', {
+        'recipe': recipe,
+        'comments': comments
+    })
+
 def upload_recipe(request):
-    return render(request, 'recipeApp/upload_recipe.html')
+    return render(request, 'recipeApp/upload_recipe.html')    
+
+@login_required
+def favorite_recipe(request, recipe_id):
+    recipe = get_object_or_404(Recipe, id=recipe_id)
+    favorite, created = Favorite.objects.get_or_create(user=request.user, recipe=recipe)
+
+    if not created:
+        # If already favorited, remove from favorites
+        favorite.delete()
+    
+    return redirect('recipe_detail', recipe_name=recipe.recipe_name) 
+
+@login_required
+def favorites(request):
+    favorite_recipes = Recipe.objects.filter(favorite__user=request.user)
+    return render(request, 'recipeApp/favorites.html', {'favorite_recipes': favorite_recipes})
+  

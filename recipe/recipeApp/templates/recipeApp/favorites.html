@@ -1,0 +1,14 @@
+{% extends 'recipeApp/base.html' %}
+
+{% block content %}
+<h2>Your Favorite Recipes</h2>
+<ul>
+    {% for recipe in favorite_recipes %}
+        <li>
+            <a href="{% url 'recipe_detail' recipe.recipe_name %}">{{ recipe.recipe_name }}</a>
+        </li>
+    {% empty %}
+        <p>You haven't favorited any recipes yet.</p>
+    {% endfor %}
+</ul>
+{% endblock %}

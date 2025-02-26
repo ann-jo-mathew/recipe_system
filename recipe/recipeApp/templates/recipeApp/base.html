@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="description" content="">
@@ -12,162 +13,169 @@
 
     <!-- Favicon -->
     <link rel="icon" href="{% static 'recipeApp/img/core-img/favicon.ico' %}">
-    
+
     <!-- Core Stylesheet -->
     <link rel="stylesheet" href="{% static 'recipeApp/style.css' %}">
 </head>
+
 <body>
 
-<!-- ##### Header Area Start ##### -->
-<header class="header-area">
-    <!-- Top Header Area -->
-    <div class="top-header-area">
-        <div class="container h-100">
-            <div class="row h-100 align-items-center justify-content-between">
-                <!-- Breaking News -->
-                <div class="col-12 col-sm-6">
-                    <div class="breaking-news">
-                        <div id="breakingNewsTicker" class="ticker">
-                            <ul>
-                                <li><a href="#">Hello World!</a></li>
-                                <li><a href="#">Welcome to CookShare.</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Top Social Info -->
-                <div class="top-social-info text-right">
-                    <a href="{% url 'user_profile' %}">
-                        {% if user.is_authenticated %}
-                            {% if user.profile.profile_picture %}
-                                <img src="{{ user.profile.profile_picture.url }}" 
-                                     alt="Profile Picture" 
-                                     width="40" height="40" 
-                                     style="border-radius: 50%; object-fit: cover;">
-                            {% else %}
-                                <img src="{% static 'recipeApp/img/default-profile.png' %}" 
-                                     alt="Default Profile Picture" 
-                                     width="40" height="40" 
-                                     style="border-radius: 50%; object-fit: cover;">
-                            {% endif %}
-                        {% endif %}
-                    </a>
-                    
-                    
-
-
-
-                
-                        <!-- Logout Button -->
-                        <form action="{% url 'logout' %}" method="post" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger btn-sm">Log Out</button>
-                        </form>
-                    
-                        <!-- Login Button -->
-                         
-                </div>
-                
-            </div>
-        </div>
-    </div>
-
-    <!-- Navbar Area -->
-    <div class="delicious-main-menu">
-        <div class="classy-nav-container breakpoint-off">
-            <div class="container">
-                <!-- Menu -->
-                <nav class="classy-navbar justify-content-between" id="deliciousNav">
-
-                    <!-- Logo -->
-                    <a class="nav-brand" href=""><img src="{% static 'recipeApp/img/core-img/logo.png' %}" width="140px" height="140px" alt=""></a>
-
-                    <!-- Navbar Toggler -->
-                    <div class="classy-navbar-toggler">
-                        <span class="navbarToggler"><span></span><span></span><span></span></span>
-                    </div>
-
-                    <!-- Menu -->
-                    <div class="classy-menu">
-                        <!-- close btn -->
-                        <div class="classycloseIcon">
-                            <div class="cross-wrap"><span class="top"></span><span class="bottom"></span></div>
-                        </div>
-
-                        <!-- Nav Start -->
-                        <div class="classynav">
-                            <ul>
-                                <li class="active"><a href="">Home</a></li>
-                                <li><a href="#">Pages</a>
-                                    <ul class="dropdown">
-                                        <li><a href="index.html">Home</a></li>
-                                        <li><a href="about.html">About Us</a></li>
-                                        <li><a href="blog-post.html">Blog Post</a></li>
-                                        <li><a href="receipe-post.html">Recipe Post</a></li>
-                                        <li><a href="contact.html">Contact</a></li>
-                                        <li><a href="elements.html">Elements</a></li>
-                                    </ul>
-                                </li>
-                                <li><a href="receipe-post.html">Recipes</a></li>
-                                <li><a href="receipe-post.html">4 Vegans</a></li>
-                                <li><a href="contact.html">Contact</a></li>
-                            </ul>
-
-                            <!-- Search Button -->
-                            <div class="search-btn">
-                                <i class="fa fa-search" aria-hidden="true"></i>
+    <!-- ##### Header Area Start ##### -->
+    <header class="header-area">
+        <!-- Top Header Area -->
+        <div class="top-header-area">
+            <div class="container h-100">
+                <div class="row h-100 align-items-center justify-content-between">
+                    <!-- Breaking News -->
+                    <div class="col-12 col-sm-6">
+                        <div class="breaking-news">
+                            <div id="breakingNewsTicker" class="ticker">
+                                <ul>
+                                    <li><a href="#">Hello World!</a></li>
+                                    <li><a href="#">Welcome to CookShare.</a></li>
+                                </ul>
                             </div>
                         </div>
-                        <!-- Nav End -->
                     </div>
-                </nav>
+
+                   <!-- Top Social Info -->
+<div class="top-social-info text-right">
+    {% if user.is_authenticated %}
+        <!-- Profile Picture -->
+        <a href="{% url 'user_profile' %}">
+            {% if user.profile.profile_picture %}
+                <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" width="40"
+                    height="40" style="border-radius: 50%; object-fit: cover;">
+            {% else %}
+                <img src="{% static 'recipeApp/img/default-profile.png' %}" alt="Default Profile Picture"
+                    width="40" height="40" style="border-radius: 50%; object-fit: cover;">
+            {% endif %}
+        </a>
+
+        <!-- Logout Button -->
+        <form action="{% url 'logout' %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-sm">Log Out</button>
+        </form>
+    
+    {% else %}
+        <!-- Login Button (Visible when user is logged out) -->
+        <a href="{% url 'loginuser' %}" class="btn btn-primary btn-sm">Log In</a>
+    {% endif %}
+</div>
+
+
+                </div>
             </div>
         </div>
-    </div>
-</header>
-<!-- ##### Header Area End ##### -->
 
-<main>
-    {% block content %}{% endblock %}
-</main>
+        <!-- Navbar Area -->
+        <div class="delicious-main-menu">
+            <div class="classy-nav-container breakpoint-off">
+                <div class="container">
+                    <!-- Menu -->
+                    <nav class="classy-navbar justify-content-between" id="deliciousNav">
 
-<!-- ##### Footer Area Start ##### -->
-<footer class="footer-area">
-    <div class="container h-100">
-        <div class="row h-100">
-            <div class="col-12 h-100 d-flex flex-wrap align-items-center justify-content-between">
-                <!-- Footer Social Info -->
-                <div class="footer-social-info text-right">
-                    <a href="#"><i class="fa fa-pinterest" aria-hidden="true"></i></a>
-                    <a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a>
-                    <a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a>
-                    <a href="#"><i class="fa fa-dribbble" aria-hidden="true"></i></a>
-                    <a href="#"><i class="fa fa-behance" aria-hidden="true"></i></a>
-                    <a href="#"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
+                        <!-- Logo -->
+                        <a class="nav-brand" href=""><img src="{% static 'recipeApp/img/core-img/logo.png' %}"
+                                width="140px" height="140px" alt=""></a>
+
+                        <!-- Navbar Toggler -->
+                        <div class="classy-navbar-toggler">
+                            <span class="navbarToggler"><span></span><span></span><span></span></span>
+                        </div>
+
+                        <!-- Menu -->
+                        <div class="classy-menu">
+                            <!-- close btn -->
+                            <div class="classycloseIcon">
+                                <div class="cross-wrap"><span class="top"></span><span class="bottom"></span></div>
+                            </div>
+
+                            <!-- Nav Start -->
+                            <div class="classynav">
+                                <ul>
+                                    <li class="active"><a href="">Home</a></li>
+                                    <li><a href="#">Pages</a>
+                                        <ul class="dropdown">
+                                            <li><a href="index.html">Home</a></li>
+                                            <li><a href="about.html">About Us</a></li>
+                                            <li><a href="blog-post.html">Blog Post</a></li>
+                                            <li><a href="receipe-post.html">Recipe Post</a></li>
+                                            <li><a href="contact.html">Contact</a></li>
+                                            <li><a href="elements.html">Elements</a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a href="receipe-post.html">Recipes</a></li>
+                                    <li><a href="receipe-post.html">4 Vegans</a></li>
+                                    <li><a href="contact.html">Contact</a></li>
+                                </ul>
+
+                                <!-- Search Button -->
+                                <div class="search-btn">
+                                    <form action="{% url 'search_recipe' %}" method="GET" style="display: flex; align-items: center;">
+                                        <input type="text" name="q" placeholder="Search recipes..." required
+                                            style="border: none; padding: 5px; border-radius: 5px; outline: none;">
+                                        <button type="submit" style="background: none; border: none; cursor: pointer;">
+                                            <i class="fa fa-search" aria-hidden="true"></i>
+                                        </button>
+                                    </form>
+</div>
+
+                            </div>
+                            <!-- Nav End -->
+                        </div>
+                    </nav>
                 </div>
-                <!-- Footer Logo -->
-                <div class="footer-logo">
-                    <a href="index.html"><img src="{% static 'recipeApp/img/core-img/logo.png' %}" width="140px" height="140px" alt=""></a>
-                </div>
-                <!-- Copywrite -->
-                <p>
-                    Copyright &copy;<script>document.write(new Date().getFullYear());</script>
-                    All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> 
-                    by <a href="https://colorlib.com" target="_blank">Colorlib</a>
-                </p>
             </div>
         </div>
-    </div>
-</footer>
-<!-- ##### Footer Area End ##### -->
+    </header>
+    <!-- ##### Header Area End ##### -->
 
-<!-- ##### All Javascript Files ##### -->
-<script src="{% static 'recipeApp/js/jquery/jquery-2.2.4.min.js' %}"></script>
-<script src="{% static 'recipeApp/js/bootstrap/popper.min.js' %}"></script>
-<script src="{% static 'recipeApp/js/bootstrap/bootstrap.min.js' %}"></script>
-<script src="{% static 'recipeApp/js/plugins/plugins.js' %}"></script>
-<script src="{% static 'recipeApp/js/active.js' %}"></script>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- ##### Footer Area Start ##### -->
+    <footer class="footer-area">
+        <div class="container h-100">
+            <div class="row h-100">
+                <div class="col-12 h-100 d-flex flex-wrap align-items-center justify-content-between">
+                    <!-- Footer Social Info -->
+                    <div class="footer-social-info text-right">
+                        <a href="#"><i class="fa fa-pinterest" aria-hidden="true"></i></a>
+                        <a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a>
+                        <a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a>
+                        <a href="#"><i class="fa fa-dribbble" aria-hidden="true"></i></a>
+                        <a href="#"><i class="fa fa-behance" aria-hidden="true"></i></a>
+                        <a href="#"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
+                    </div>
+                    <!-- Footer Logo -->
+                    <div class="footer-logo">
+                        <a href="index.html"><img src="{% static 'recipeApp/img/core-img/logo.png' %}" width="140px"
+                                height="140px" alt=""></a>
+                    </div>
+                    <!-- Copywrite -->
+                    <p>
+                        Copyright &copy;
+                        <script>document.write(new Date().getFullYear());</script>
+                        All rights reserved | This template is made with <i class="fa fa-heart-o"
+                            aria-hidden="true"></i>
+                        by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- ##### Footer Area End ##### -->
+
+    <!-- ##### All Javascript Files ##### -->
+    <script src="{% static 'recipeApp/js/jquery/jquery-2.2.4.min.js' %}"></script>
+    <script src="{% static 'recipeApp/js/bootstrap/popper.min.js' %}"></script>
+    <script src="{% static 'recipeApp/js/bootstrap/bootstrap.min.js' %}"></script>
+    <script src="{% static 'recipeApp/js/plugins/plugins.js' %}"></script>
+    <script src="{% static 'recipeApp/js/active.js' %}"></script>
 
 </body>
+
 </html>

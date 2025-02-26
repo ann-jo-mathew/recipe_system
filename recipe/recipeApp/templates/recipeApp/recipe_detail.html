@@ -1,0 +1,70 @@
+{% extends 'recipeApp/base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+    <div class="row">
+        <!-- Left Section: Recipe Image & Details -->
+        <div class="col-md-8">
+            <h1 class="mb-3">{{ recipe.recipe_name }}</h1>
+            
+            {% if recipe.image %}
+                <img src="{{ recipe.image.url }}" class="img-fluid rounded" alt="{{ recipe.recipe_name }}">
+            {% else %}
+                <p>No image available</p>
+            {% endif %}
+            
+            <p class="mt-3"><strong>Time Needed:</strong> {{ recipe.time_needed }} minutes</p>
+
+            <!-- Instructions -->
+            <h3 class="mt-4">Instructions</h3>
+            <ol>
+                {% for step in instructions %}
+                    <li class="mb-2">
+                        <strong>Step {{ step.step_no }}:</strong> {{ step.description }}
+                    </li>
+                {% empty %}
+                    <p>No instructions available.</p>
+                {% endfor %}
+            </ol>
+
+            <!-- Link to Comments Page -->
+            <a href="{% url 'recipe_comments' recipe.id %}" class="btn btn-secondary mt-3">View/Add Comments</a>
+        </div>
+
+        <!-- Right Section: Ingredients & Rating -->
+        <div class="col-md-4">
+            <!-- Star Rating -->
+            <h3>Average Rating</h3>
+            <p>
+                {% if average_rating %}
+                    ⭐ {{ average_rating|floatformat:1 }} / 5
+                {% else %}
+                    No ratings yet.
+                {% endif %}
+            </p>
+
+            <!-- Ingredients -->
+            <h3>Ingredients</h3>
+            <ul>
+                {% for item in ingredients %}
+                    <li>{{ item.ingredient.ingredient_name }} - {{ item.measure }}</li>
+                {% empty %}
+                    <p>No ingredients listed.</p>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+<form action="{% url 'favorite_recipe' recipe.id %}" method="POST">
+    {% csrf_token %}
+    <button type="submit">
+        {% if user in recipe.favorite_set.all.values_list('user', flat=True) %}
+            ★ Unfavorite
+        {% else %}
+            ☆ Add to Favorites
+        {% endif %}
+    </button>
+</form>
+
+
+{% endblock %}

@@ -42,8 +42,14 @@
                 <!-- Top Social Info -->
                 <div class="col-12 col-sm-6">
                     <div class="top-social-info text-right">
-                        <a href="{% url 'loginuser' %}" class="btn btn-success btn-sm">Log In</a>
-                        <!--<a href="signup.html" class="btn btn-primary btn-sm">Sign Up</a>-->
+                        {% if user.is_authenticated %}
+                        <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm">Log Out</button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'loginuser' %}" class="btn btn-success btn-sm" style="color: white;">Log In</a>
+                    {% endif %}
                     </div>
                 </div>
             </div>

@@ -10,6 +10,7 @@ urlpatterns = [
     path('login/', views.login_user, name='loginuser'), 
     path('signup/', views.signup, name='signup'),
     path('logout/',views.logout_user, name='logout'),
+    path('passwordreset/', views.passwordreset, name='password'),
 ]
 
 if settings.DEBUG:  # Only serve media files in development

@@ -1,23 +1,164 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - CookShare</title>
+    <!-- Favicon -->
+    <link rel="icon" href="{% static 'recipeApp/img/core-img/favicon.ico' %}">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    
+    <style>
+        .h-custom { height: calc(100% - 73px); }
+        @media (max-width: 450px) { .h-custom { height: 100%; } }
+        .signup-box {
+    max-width: 450px;
+    height: auto; /* Keep height flexible */
+    padding: 10px; /* Reduce padding slightly */
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+}
+.logo-container {
+    position: absolute;
+    top: -70px;   /* Moves the logo higher */
+    left: -70px;  /* Moves the logo more to the left */
+    z-index: 10;  /* Ensures it's above the image */
+}
 
-    <center>
-    <h2>Sign Up</h2>
-    <form method="POST" action="{% url 'signup' %}">
-        {% csrf_token %}
-        <label for="username">Username:</label>
-        <input type="text" name="username" required>
-        <br>
-        <label for="email">Email:</label>
-        <input type="email" name="email" required>
-        <br>
-        <label for="password1">Password:</label>
-        <input type="password" name="password1" required>
-        <br>
-        <label for="password2">Confirm Password:</label>
-        <input type="password" name="password2" required>
-        <br>
-        <button type="submit">Sign Up</button>
-    </form>
+.img-fluid {
+    width: 110%;  /* Expands the image width */
+    height: auto;
+    object-fit: cover; /* Ensures good quality */
+}
 
-    <p>Already have an account? <a href="{% url 'loginuser' %}">Login</a></p>
-</center>
 
+    </style>
+</head>
+<body>
+
+<section class="vh-100">
+    <div class="container-fluid h-custom">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-md-9 col-lg-6 col-xl-5 position-relative">
+                <!-- Logo Positioned at Top-Left of the Image -->
+                <div class="logo-container">
+                    <img src="{% static 'recipeApp/img/core-img/logo.png' %}" alt="CookShare Logo">
+                </div>
+            
+                <!-- Image -->
+                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"
+                     class="img-fluid rounded" alt="Sample image">
+            </div>
+            <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+                <div class="signup-box">
+                    <div class="text-center">
+                        <h2 class="mb-4">Sign Up</h2>
+                    </div>
+
+                    <!-- Display Alert Messages -->
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="POST" action="{% url 'signup' %}">
+                        {% csrf_token %}
+
+                        <!-- Username -->
+                        <div class="form-outline mb-4">
+                            <label class="form-label" for="usernameField">Username</label>
+                            <input type="text" id="usernameField" name="username" class="form-control form-control-lg"
+                                   placeholder="Enter your username" required />
+                        </div>
+
+                        <!-- Email -->
+                        <div class="form-outline mb-4">
+                            <label class="form-label" for="emailField">Email</label>
+                            <input type="email" id="emailField" name="email" class="form-control form-control-lg"
+                                   placeholder="Enter your email" required />
+                        </div>
+
+                        <!-- Password -->
+                        <div class="form-outline mb-3">
+                            <label class="form-label" for="passwordField1">Password</label>
+                            <input type="password" id="passwordField1" name="password" class="form-control form-control-lg"
+                                   placeholder="Enter password" required />
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div class="form-outline mb-3">
+                            <label class="form-label" for="passwordField2">Confirm Password</label>
+                            <input type="password" id="passwordField2" name="confirm_password" class="form-control form-control-lg"
+                                   placeholder="Confirm password" required />
+                        </div>
+
+                        <div class="text-center text-lg-start mt-4 pt-2">
+                            <button type="submit" class="btn btn-primary btn-lg w-100">Sign Up</button>
+                            <p class="small fw-bold mt-2 pt-1 mb-0">Already have an account?  
+                                <a href="{% url 'loginuser' %}" class="link-danger">Login</a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-primary">
+        <div class="text-white mb-3 mb-md-0">
+            Copyright © 2025. All rights reserved.
+        </div>
+    </div>
+</section>
+
+<!-- Bootstrap Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- JavaScript Validation -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector("form");
+        const emailField = document.getElementById("emailField");
+        const password1 = document.getElementById("passwordField1");
+        const password2 = document.getElementById("passwordField2");
+
+        form.addEventListener("submit", function (event) {
+            let valid = true;
+            let emailValue = emailField.value.trim();
+            let password1Value = password1.value.trim();
+            let password2Value = password2.value.trim();
+            let emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+            // Email validation
+            if (!emailRegex.test(emailValue)) {
+                alert("Please enter a valid email address.");
+                valid = false;
+            }
+
+            // Password matching validation
+            if (password1Value !== password2Value) {
+                alert("Passwords do not match.");
+                valid = false;
+            }
+
+            if (!valid) {
+                event.preventDefault(); // Stop form submission
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -35,7 +35,7 @@ class RecipeIngredient(Timestamp):
     measure = models.CharField(max_length=50, default="Enter measurement")
 
     def __str__(self):
-        return self.ingredient.ingredient_name
+        return f"{self.recipe.recipe_name}: {self.ingredient.ingredient_name} - {self.measure}"  
 
 
 class Instruction(Timestamp):
@@ -62,3 +62,12 @@ class Rating(Timestamp):
 
     def __str__(self):
         return f"{self.user.username} rated {self.recipe.recipe_name} {self.rating} stars"
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    address = models.TextField(blank=True, null=True)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/', default='profile_pics/default.jpg')
+
+    def __str__(self):
+        return self.user.username

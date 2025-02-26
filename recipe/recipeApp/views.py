@@ -7,6 +7,9 @@ from django.contrib import messages
 import logging
 from django.contrib.auth import get_user_model  # ✅ Add this import
 from django.contrib.auth.decorators import login_required
+from .models import UserProfile
+from .forms import UserProfileForm
+
 
 
 logger = logging.getLogger(__name__)
@@ -66,6 +69,20 @@ def login_user(request):
 
     return render(request, 'recipeApp/login.html')
 
+@login_required
+def user_profile(request):
+    profile = UserProfile.objects.get(user=request.user)
+    
+    if request.method == "POST":
+        form = UserProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect('user_profile')  # Reload the same page after saving
+
+    else:
+        form = UserProfileForm(instance=profile)
+
+    return render(request, 'user_profile.html', {'profile': profile, 'form': form})
 # Logout View
 def logout_user(request):
     auth_logout(request)

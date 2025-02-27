@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Recipe, RecipeIngredient, Instruction, Rating, Favorite, UserProfile
+from .models import Recipe, Ingredient, Instruction, Rating, Favorite, UserProfile
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout, get_user_model
 # Rename to avoid conflict
@@ -88,9 +88,16 @@ def logout_user(request):
     auth_logout(request)
     messages.success(request, "Thanks for spending some quality time with the website today. Log in again if needed.")
     return redirect('index')  # Redirect to homepage
+
 # Index View
 def index(request):
-    latest_recipes = Recipe.objects.order_by('-created_at')[:6]  # Fetch latest 6 recipes
+    latest_recipes = Recipe.objects.annotate(avg_rating=Avg('rating__rating')).order_by('-created_at')[:6]  # Fetch latest 6 recipes
+    
+    # Convert avg_rating to full_stars and empty_stars
+    for recipe in latest_recipes:
+        recipe.full_stars = int(recipe.avg_rating) if recipe.avg_rating else 0
+        recipe.empty_stars = 5 - recipe.full_stars
+
     context = {
         'latest_recipes': latest_recipes,
         'user': request.user  # Include the user object in the context
@@ -131,7 +138,7 @@ def search_recipe(request):
 
     for recipe in recipes:
         # Fetch ingredients and instructions for each recipe
-        recipe.ingredients = RecipeIngredient.objects.filter(recipe=recipe)
+        recipe.ingredients = Ingredient.objects.filter(recipe=recipe)
         recipe.instructions = Instruction.objects.filter(recipe=recipe).order_by('step_no')
         ratings = Rating.objects.filter(recipe=recipe)
 
@@ -153,7 +160,7 @@ def passwordreset(request):
 def recipe_detail(request, recipe_name):
     recipe = get_object_or_404(Recipe, recipe_name=recipe_name)
     instructions = Instruction.objects.filter(recipe=recipe).order_by('step_no')
-    ingredients = RecipeIngredient.objects.filter(recipe=recipe)
+    ingredients = Ingredient.objects.filter(recipe=recipe)
     
     # Calculate average rating
     average_rating = Rating.objects.filter(recipe=recipe).aggregate(Avg('rating'))['rating__avg'] or 0
@@ -207,3 +214,6 @@ def favorites(request):
     favorite_recipes = Recipe.objects.filter(favorite__user=request.user)
     return render(request, 'recipeApp/favorites.html', {'favorite_recipes': favorite_recipes})
   
+def recipe_list(request):
+    recipes = Recipe.objects.all().annotate(avg_rating=Avg('rating__rating'))
+    return render(request, 'recipeApp/recipe_list.html', {'recipes': recipes})

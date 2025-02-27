@@ -18,31 +18,49 @@ class Recipe(Timestamp):
     recipe_name = models.CharField(max_length=255)
     image = models.ImageField(upload_to='recipe_images/', null=True, blank=True)
     time_needed = models.CharField(max_length=50, default="Not specified")
+    serving_portion = models.CharField(max_length=50, default="1 serving") 
 
-
+    class Meta:
+        unique_together = ('user', 'recipe_name') 
+        
     def __str__(self):
         return self.recipe_name
 
-class Ingredient(Timestamp):
+""" class Ingredient(Timestamp):
     ingredient_name = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.ingredient_name
+        return self.ingredient_name """
 
-class RecipeIngredient(Timestamp):
+""" class RecipeIngredient(Timestamp):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     measure = models.CharField(max_length=50, default="Enter measurement")
 
     def __str__(self):
-        return f"{self.recipe.recipe_name}: {self.ingredient.ingredient_name} - {self.measure}"  
+        return f"{self.recipe.recipe_name}: {self.ingredient.ingredient_name} - {self.measure}"   """
 
+class Ingredient(Timestamp):  
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,null=True,blank=False) #null=True,blank=False because we want to make sure that the ingredient is always associated with a recipe
+    ingredient_name = models.CharField(max_length=255)  # Ingredient name (not globally unique)
+    measure = models.CharField(max_length=50, default="Enter measurement")  # Users enter measurement manually
+
+    class Meta:
+        unique_together = ('recipe', 'ingredient_name')  
+        # 🔹 Ensures that **an ingredient is not added twice to the same recipe**.
+
+    def __str__(self):
+        return f"{self.ingredient_name} - {self.measure}"
 
 class Instruction(Timestamp):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     step_no = models.IntegerField()
     description = models.TextField()
-    image = models.ImageField(upload_to='instruction_images/', null=True, blank=True)
+    """ image = models.ImageField(upload_to='instruction_images/', null=True, blank=True) """
+
+    class Meta:
+        unique_together = ('recipe', 'step_no')  
+        # 🔹 Ensures that **step numbers do not repeat** within the same recipe.
 
     def __str__(self):
         return f"Step {self.step_no} for {self.recipe.recipe_name}"
@@ -62,6 +80,9 @@ class Rating(Timestamp):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     rating = models.IntegerField()  # Example: 1-5 stars
     comment = models.TextField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ('user', 'recipe')# Prevent duplicate ratings 
 
     def __str__(self):
         return f"{self.user.username} rated {self.recipe.recipe_name} {self.rating} stars"

@@ -1,15 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Recipe
+from .models import Recipe, RecipeIngredient, Instruction, Rating, Favorite, UserProfile
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login as auth_login
-from django.contrib.auth import logout as auth_logout  # Rename to avoid conflict
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout, get_user_model
+# Rename to avoid conflict
 from django.contrib import messages
 import logging
-from django.contrib.auth import get_user_model  # ✅ Add this import
 from django.contrib.auth.decorators import login_required
-from .models import UserProfile
 from .forms import UserProfileForm
-from .models import Recipe, RecipeIngredient, Instruction, Rating
 from django.db.models import Avg
 
 

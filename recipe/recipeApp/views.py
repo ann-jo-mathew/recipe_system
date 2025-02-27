@@ -118,6 +118,11 @@ def contact(request):
     return render(request, 'recipeApp/elements.html')"""
  
 
+def recipe_detail(request, recipe_name):
+    recipe = get_object_or_404(Recipe, recipe_name=recipe_name)
+    return render(request, 'recipeApp/recipe_detail.html', {'recipe': recipe})
+
+
 """ def latest_recipes(request):
     latest_recipes = Recipe.objects.order_by('-created_at')[:6]  # Fetch latest 6 recipes
     print(latest_recipes)  

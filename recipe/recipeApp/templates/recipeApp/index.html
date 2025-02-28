@@ -32,7 +32,7 @@
                         <div class="col-12 col-md-9 col-lg-7 col-xl-6">
                             <div class="hero-slides-content">
                                 <h2 >Cook, Share, and Inspire!</h2>
-                                <p >Cook, create, and share your favorite recipes. Explore new cuisines and make every meal a homemade delight!</p>
+                                <p >Cook your own delicious meals, share your favorite recipes, and inspire others—whether you're a home cook, a chef, or just love exploring new flavors!</p>
                                 <a href="#" class="btn delicious-btn">See Receipe</a>
                             </div>
                         </div>
@@ -75,12 +75,20 @@
                                         <p>Time Needed: {{ recipe.time_needed }}</p>
                                         <!-- <a href="{% url 'recipe_detail' recipe_name=recipe.recipe_name %}">View Details</a>-->
                                    <!--</a> -->
+                                   <!--Strar rating-->
                                     <div class="ratings">
-                                        <i class="fa fa-star" aria-hidden="true"></i>
-                                        <i class="fa fa-star" aria-hidden="true"></i>
-                                        <i class="fa fa-star" aria-hidden="true"></i>
-                                        <i class="fa fa-star" aria-hidden="true"></i>
-                                        <i class="fa fa-star-o" aria-hidden="true"></i>
+                                        {% for _ in "12345"|slice:recipe.full_stars %}
+                                            <i class="fa fa-star" aria-hidden="true"></i>
+                                        {% endfor %}
+                                        {% for _ in "12345"|slice:recipe.empty_stars %}
+                                            <i class="fa fa-star-o" aria-hidden="true"></i>
+                                        {% endfor %}
+
+                                        {% if recipe.avg_rating %}
+                                            <p>Rating: {{ recipe.avg_rating|floatformat:1 }} / 5</p>
+                                        {% else %}
+                                            <p>No ratings yet</p>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>

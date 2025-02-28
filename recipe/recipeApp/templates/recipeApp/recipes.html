@@ -1,0 +1,75 @@
+{% extends 'recipeApp/base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipes</title>
+</head>
+<body>
+   {% block content %}
+   <main> 
+    <section class="best-receipe-area"></section>
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="section-heading">
+                        <h1>Recipes</h1>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                {% for recipe in recipes %}
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="single-best-receipe-area mb-30">
+                        
+                    <img src="{{ recipe.image.url }}" alt="{{ recipe.recipe_name }}">
+                    <div class="receipe-content">
+                         <a href="{% url 'recipe_detail' recipe_name=recipe.recipe_name %}">
+                        <h2>{{ recipe.recipe_name }}</h2></a>
+                        <p>Time Needed: {{ recipe.time_needed }}</p>
+                    
+                <div class="ratings">
+                    {% for _ in "12345"|slice:recipe.full_stars %}
+                        <i class="fa fa-star" aria-hidden="true"></i>
+                    {% endfor %}
+                    {% for _ in "12345"|slice:recipe.empty_stars %}
+                        <i class="fa fa-star-o" aria-hidden="true"></i>
+                    {% endfor %}
+
+                    {% if recipe.avg_rating %}
+                        <p>Rating: {{ recipe.avg_rating|floatformat:1 }} / 5</p>
+                    {% else %}
+                        <p>No ratings yet</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div> 
+    {% empty %}
+        <p>No recipes found.</p>
+    {% endfor %}
+        </div>
+         <div class="pagination">
+                <ul class="pagination-list">
+                    {% if recipes.has_previous %}
+                        <li><a href="?page=1">&laquo; First</a></li>
+                        <li><a href="?page={{ recipes.previous_page_number }}">Previous</a></li>
+                    {% endif %}
+
+                    <li>Page {{ recipes.number }} of {{ recipes.paginator.num_pages }}</li>
+
+                    {% if recipes.has_next %}
+                        <li><a href="?page={{ recipes.next_page_number }}">Next</a></li>
+                        <li><a href="?page={{ recipes.paginator.num_pages }}">Last &raquo;</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    
+    </section>
+    </main>
+{% endblock %}
+</body>
+</html>

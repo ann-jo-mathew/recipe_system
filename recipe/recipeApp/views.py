@@ -12,6 +12,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.core.mail import send_mail
 from django.contrib.auth.hashers import make_password
+from django.core.paginator import Paginator
 import random
 import string
 
@@ -236,6 +237,14 @@ def favorites(request):
     favorite_recipes = Recipe.objects.filter(favorite__user=request.user)
     return render(request, 'recipeApp/favorites.html', {'favorite_recipes': favorite_recipes})
   
-def recipe_list(request):
-    recipes = Recipe.objects.all().annotate(avg_rating=Avg('rating__rating'))
-    return render(request, 'recipeApp/recipe_list.html', {'recipes': recipes})
+def recipe_list(request):    
+    recipes = Recipe.objects.all().annotate(avg_rating=Avg('rating__rating')).order_by('-created_at')
+    # Convert avg_rating to full_stars and empty_stars
+    for recipe in recipes:
+        recipe.full_stars = int(recipe.avg_rating) if recipe.avg_rating else 0
+        recipe.empty_stars = 5 - recipe.full_stars
+
+    paginator = Paginator(recipes, 9)  
+    page_number = request.GET.get('page')  
+    recipes = paginator.get_page(page_number) 
+    return render(request, 'recipeApp/recipes.html', {'recipes': recipes})

@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import search_recipe, reset_password
+from .views import search_recipe
 from .views import recipe_detail, recipe_comments, favorite_recipe, favorites, change_password
 
 
@@ -12,7 +12,6 @@ urlpatterns = [
     path('signup/', views.signup, name='signup'),
     path('logout/',views.logout_user, name='logout'),
     path('change-password/', views.change_password, name="changepassword"),
-    path('reset-password/', views.reset_password, name="resetpassword"),
     path('profile/', views.user_profile, name='user_profile'),
     path('about/', views.about, name='about'),
     path('upload/', views.upload_recipe, name='upload_recipe'),

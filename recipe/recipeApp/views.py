@@ -11,37 +11,9 @@ from django.db.models import Avg
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.core.mail import send_mail
+from django.contrib.auth.hashers import make_password
 import random
 import string
-
-def reset_password(request):
-    if request.method == "POST":
-        email = request.POST.get("email")
-        try:
-            user = User.objects.get(email=email)
-            new_password = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
-            user.set_password(new_password)
-            user.save()
-            
-            # Send email with new password (replace with real email sending)
-            send_mail(
-                "Password Reset - CookShare",
-                f"Your new password is: {new_password}",
-                "noreply@cookshare.com",
-                [email],
-                fail_silently=False,
-            )
-
-            messages.success(request, "A new password has been sent to your email.")
-            return redirect("loginuser")
-
-        except User.DoesNotExist:
-            messages.error(request, "Email not found.")
-    
-    return render(request, "recipeApp/reset_password.html")
-
-
-logger = logging.getLogger(__name__)
 
 # Signup View
 def signup(request):
@@ -184,31 +156,28 @@ def about(request):
     return render(request, 'recipeApp/about.html')
 
 
-@login_required(login_url='/login/')
+#@login_required(login_url='/login/')
 
 def change_password(request):
     if request.method == "POST":
-        old_password = request.POST.get("old_password")
+        username_email = request.POST['username_email']
         new_password = request.POST.get("new_password")
         confirm_password = request.POST.get("confirm_password")
 
-        if new_password != confirm_password:
-            messages.error(request, "New passwords do not match.")
-            return redirect("change_password")
+         # Check if the username or email exists
+        user = User.objects.filter(username=username_email).first() or User.objects.filter(email=username_email).first()
+        if user:
+            if new_password == confirm_password:
+                user.password = make_password(new_password)  # Hash password
+                user.save()
+                messages.success(request, "Your password has been reset successfully! You can now login.")
+                return redirect('loginuser')
+            else:
+                messages.error(request, "Passwords do not match. Please try again.")
+        else:
+            messages.error(request, "User not found. Please check your username or email.")
 
-        user = request.user
-        if not user.check_password(old_password):
-            messages.error(request, "Old password is incorrect.")
-            return redirect("change_password")
-
-        user.set_password(new_password)
-        user.save()
-        update_session_auth_hash(request, user)  # Prevents logout after password change
-        messages.success(request, "Password changed successfully.")
-        return redirect("loginuser")
-
-    return render(request, "recipeApp/c-password.html")
-
+    return render(request, 'recipeApp/c-password.html')
 
 def recipe_detail(request, recipe_name):
     recipe = get_object_or_404(Recipe, recipe_name=recipe_name)

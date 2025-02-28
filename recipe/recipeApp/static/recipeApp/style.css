@@ -1483,3 +1483,27 @@ height: 100%;
     .back-button:hover {
         background-color: #0056b3;
     }
+    .pagination {
+      text-align: center;
+      margin: 20px 0;
+  }
+  .pagination-list {
+      list-style: none;
+      padding: 0;
+      display: inline-block;
+  }
+  .pagination-list li {
+      display: inline;
+      margin: 0 5px;
+  }
+  .pagination-list a {
+      text-decoration: none;
+      padding: 8px 12px;
+      background-color: #007bff;
+      color: white;
+      border-radius: 5px;
+  }
+  .pagination-list a:hover {
+      background-color: #0056b3;
+  }
+  

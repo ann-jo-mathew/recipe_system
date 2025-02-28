@@ -3,11 +3,12 @@ from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 from .views import search_recipe
-from .views import recipe_detail, recipe_comments, favorite_recipe, favorites, change_password
+from .views import recipe_detail, recipe_comments, favorite_recipe, favorites, change_password, recipe_list
 
 
 urlpatterns = [
-    path('', views.index, name='index'), 
+    path('', views.index, name='index'),
+    path('recipes/', views.recipe_list, name='recipes'), 
     path('login/', views.login_user, name='loginuser'), 
     path('signup/', views.signup, name='signup'),
     path('logout/',views.logout_user, name='logout'),

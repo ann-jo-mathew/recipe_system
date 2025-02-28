@@ -688,7 +688,7 @@ textarea:focus {
   .single-best-receipe-area img {
     border-bottom: 3px solid #40ba37; }
   .single-best-receipe-area .receipe-content {
-    padding-top: 30px;
+    padding-top: 0px;
     text-align: center; }
     .single-best-receipe-area .receipe-content h5 {
       font-size: 18px;
@@ -1499,11 +1499,11 @@ height: 100%;
   .pagination-list a {
       text-decoration: none;
       padding: 8px 12px;
-      background-color: #007bff;
+      background-color: #1bc137;
       color: white;
       border-radius: 5px;
   }
   .pagination-list a:hover {
-      background-color: #0056b3;
+      background-color: #00801a;
   }
   

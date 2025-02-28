@@ -27,7 +27,7 @@
                     <img src="{{ recipe.image.url }}" alt="{{ recipe.recipe_name }}">
                     <div class="receipe-content">
                          <a href="{% url 'recipe_detail' recipe_name=recipe.recipe_name %}">
-                        <h2>{{ recipe.recipe_name }}</h2></a>
+                        <h2 style="font-size:20px;">{{ recipe.recipe_name }}</h2></a>
                         <p>Time Needed: {{ recipe.time_needed }}</p>
                     
                 <div class="ratings">
@@ -54,15 +54,16 @@
          <div class="pagination">
                 <ul class="pagination-list">
                     {% if recipes.has_previous %}
-                        <li><a href="?page=1">&laquo; First</a></li>
                         <li><a href="?page={{ recipes.previous_page_number }}">Previous</a></li>
+                        <li>Page {{ recipes.number }} of {{ recipes.paginator.num_pages }}</li>
+                        <li><a href="?page=1">&laquo; First</a></li>
                     {% endif %}
 
-                    <li>Page {{ recipes.number }} of {{ recipes.paginator.num_pages }}</li>
 
                     {% if recipes.has_next %}
-                        <li><a href="?page={{ recipes.next_page_number }}">Next</a></li>
                         <li><a href="?page={{ recipes.paginator.num_pages }}">Last &raquo;</a></li>
+                        <li>Page {{ recipes.number }} of {{ recipes.paginator.num_pages }}</li>
+                        <li><a href="?page={{ recipes.next_page_number }}">Next</a></li>
                     {% endif %}
                 </ul>
             </div>

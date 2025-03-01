@@ -114,10 +114,18 @@
                         <!-- Nav Start -->
                         <div class="classynav">
                         <ul>
-                                <li class="active"><a href="{% url 'index' %}">Home</a></li>
-                                <li><a href="{%url 'recipes' %}">Recipes</a></li>
-                                <li><a href="{receipe-post.html}">About</a></li>
-                                <li><a href="contact.html">Contact</a></li>
+                                <li class="{% if request.path == '/' %}active{% endif %}">
+                                    <a href="{% url 'index' %}">Home</a>
+                                </li>
+                                <li class="{% if 'recipes' in request.path %}active{% endif %}">
+                                    <a href="{% url 'recipes' %}">Recipes</a>
+                                </li>
+                                <li class="{% if 'about' in request.path %}active{% endif %}">
+                                    <a href="{% url 'about' %}">About</a>
+                                </li>
+                                <li class="{% if 'contact' in request.path %}active{% endif %}">
+                                    <a href="{% url 'contact' %}">Contact</a>
+                                </li>
                             </ul>
                         <!--{% if user.is_authenticated %}
                         <div class="navbar-before-login">

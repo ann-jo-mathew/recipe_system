@@ -107,11 +107,6 @@ def index(request):
     }
     return render(request, 'recipeApp/index.html', context)
 
-""" def index(request):
-    recipes = Recipe.objects.all()  # Fetch all recipes
-    return render(request, 'recipeApp/index.html')
-     """
-
 """def blog_post(request):
     return render(request, 'recipeApp/blog-post.html')
 
@@ -248,3 +243,9 @@ def recipe_list(request):
     page_number = request.GET.get('page')  
     recipes = paginator.get_page(page_number) 
     return render(request, 'recipeApp/recipes.html', {'recipes': recipes})
+
+def about(request):
+    return render(request, 'recipeApp/about.html')
+
+def contact(request):
+    return render(request, 'recipeApp/contact.html')

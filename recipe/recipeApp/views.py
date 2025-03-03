@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.contrib import messages
 import logging
 from django.contrib.auth.decorators import login_required
-from .forms import UserProfileForm
+from .forms import UserProfileForm, RecipeForm
 from django.db.models import Avg
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
@@ -255,3 +255,36 @@ def about(request):
 
 def contact(request):
     return render(request, 'recipeApp/contact.html')
+
+@login_required
+def create_recipe(request):
+    if request.method == 'POST':
+        form = RecipeForm(request.POST, request.FILES)
+        if form.is_valid():
+            recipe = form.save(commit=False)
+            recipe.user = request.user  # Assign the logged-in user
+            recipe.save()
+
+            # Process Ingredients
+            ingredients_data = request.POST['ingredients'].split("\n")
+            for ingredient in ingredients_data:
+                try:
+                    name, measure = ingredient.split(" - ")
+                    Ingredient.objects.create(recipe=recipe, ingredient_name=name.strip(), measure=measure.strip())
+                except ValueError:
+                    continue  # Skip invalid input lines
+
+            # Process Instructions
+            instructions_data = request.POST['instructions'].split("\n")
+            for instruction in instructions_data:
+                try:
+                    step_no, description = instruction.split(": ")
+                    Instruction.objects.create(recipe=recipe, step_no=int(step_no.strip()), description=description.strip())
+                except ValueError:
+                    continue  # Skip invalid input lines
+
+            return redirect('recipe_detail', recipe.id)
+    else:
+        form = RecipeForm()
+
+    return render(request, 'recipeApp/create.html', {'form': form})

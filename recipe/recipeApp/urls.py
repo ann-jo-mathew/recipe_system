@@ -2,8 +2,8 @@ from django.urls import path
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import search_recipe
-from .views import recipe_detail, recipe_comments, favorite_recipe, favorites, change_password, recipe_list
+#from .views import search_recipe
+#from .views import recipe_detail, recipe_comments, favorite_recipe, favorites, change_password, recipe_list
 
 
 urlpatterns = [
@@ -24,6 +24,7 @@ urlpatterns = [
     path('recipe/<int:recipe_id>/comments/', views.recipe_comments, name='recipe_comments'),
     path('about/', views.about, name='about'),
     path('contact/', views.contact, name='contact'),
+     path('create/', views.create_recipe, name='create_recipe'),
 ]
 
 if settings.DEBUG:  # Only serve media files in development

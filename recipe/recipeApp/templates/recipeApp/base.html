@@ -16,6 +16,12 @@
 
     <!-- Core Stylesheet -->
     <link rel="stylesheet" href="{% static 'recipeApp/style.css' %}">
+    <style>
+     #btn-lo{
+        background-color:rgb(5, 120, 5);
+        border-color:rgb(5, 120, 5);
+     }
+    </style>
 </head>
 
 <body>
@@ -110,7 +116,7 @@
     
     {% else %}
         <!-- Login Button (Visible when user is logged out) -->
-        <a href="{% url 'loginuser' %}" class="btn btn-primary btn-sm">Log In</a>
+        <a href="{% url 'loginuser' %}" class="btn btn-primary btn-sm" id="btn-lo" style="background-color:rgb(6, 173, 6); border-color:rgb(6, 173, 6)">Log In</a>
     {% endif %}
 </div>
 

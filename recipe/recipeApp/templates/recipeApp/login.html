@@ -67,6 +67,13 @@
     height: auto;
     object-fit: cover; /* Ensures good quality */
 }
+#btn:hover{
+    background-color:rgb(6, 88, 6)!important;
+    border-color:rgb(7, 89, 7)!important;
+
+
+}
+
     </style>
 
     <script>
@@ -85,7 +92,7 @@
         }
     </script>
 </head>
-<body>
+<body style="background-color: rgba(192, 207, 192, 0.633)!important;">
 
 <section class="vh-100">
     <div class="container-fluid h-custom">
@@ -97,13 +104,13 @@
 
             
                 <!-- Image -->
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"
-                     class="img-fluid rounded" alt="Sample image">
+                <!--<img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"
+                     class="img-fluid rounded" alt="Sample image">-->
             </div>
             
             
             <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
-                <div class="login-box">  <!-- Box added here -->
+                <div class="login-box" style="background-color: rgba(221, 238, 221, 0.575);">  <!-- Box added here -->
                     <div class="text-center">
                         <h2 class="mb-4">Login</h2>
                     </div>
@@ -140,7 +147,7 @@
                         </div>
 
                         <div class="text-center text-lg-start mt-4 pt-2">
-                            <button type="submit" class="btn btn-primary btn-lg w-100">Login</button>
+                            <button type="submit" class="btn btn-primary btn-lg w-100" id="btn" style="background-color:rgb(12, 158, 12);border-color:rgb(12, 158, 12);">Login</button>
                             <p class="small fw-bold mt-2 pt-1 mb-0">Don't have an account? 
                                 <a href="{% url 'signup' %}" class="link-danger">Sign up</a>
                             </p>
@@ -152,7 +159,7 @@
     </div>
 
     <!-- Footer -->
-    <div class="d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-primary">
+    <div class="d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-primary" style="background-color: rgb(12, 158, 12)!important;">
         <div class="text-white mb-3 mb-md-0">
             Copyright © 2025. All rights reserved.
         </div>

@@ -1472,7 +1472,7 @@ height: 100%;
         font-size: 16px;
         font-weight: bold;
         color: white;
-        background-color: #007bff;
+        background-color: #04ff00;
         border: none;
         border-radius: 5px;
         cursor: pointer;
@@ -1481,7 +1481,7 @@ height: 100%;
     }
 
     .back-button:hover {
-        background-color: #0056b3;
+        background-color: #037f01;
     }
     .pagination {
       text-align: center;

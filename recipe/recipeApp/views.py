@@ -159,7 +159,7 @@ def change_password(request):
         username_email = request.POST['username_email']
         new_password = request.POST.get("new_password")
         confirm_password = request.POST.get("confirm_password")
-
+        
          # Check if the username or email exists
         user = User.objects.filter(username=username_email).first() or User.objects.filter(email=username_email).first()
         if user:
@@ -179,6 +179,12 @@ def recipe_detail(request, recipe_name):
     recipe = get_object_or_404(Recipe, recipe_name=recipe_name)
     instructions = Instruction.objects.filter(recipe=recipe).order_by('step_no')
     ingredients = Ingredient.objects.filter(recipe=recipe)
+    favorite_users = recipe.favorite_set.all().values_list('user', flat=True)
+
+    context = {
+        'recipe': recipe,
+        'favorite_users': favorite_users,  # Pass this to the template
+    }
     
     # Calculate average rating
     average_rating = Rating.objects.filter(recipe=recipe).aggregate(Avg('rating'))['rating__avg'] or 0

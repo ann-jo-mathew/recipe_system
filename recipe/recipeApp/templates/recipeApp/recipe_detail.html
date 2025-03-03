@@ -58,11 +58,11 @@
 <form action="{% url 'favorite_recipe' recipe.id %}" method="POST">
     {% csrf_token %}
     <button type="submit">
-        {% if user in recipe.favorite_set.all.values_list('user', flat=True) %}
-            ★ Unfavorite
-        {% else %}
-            ☆ Add to Favorites
-        {% endif %}
+        {% if request.user.id in favorite_users %}
+        <p>This recipe is in your favorites!</p>
+    {% else %}
+        <p>Add to favorites?</p>
+    {% endif %}
     </button>
 </form>
 

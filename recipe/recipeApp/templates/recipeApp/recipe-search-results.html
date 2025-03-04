@@ -1,79 +1,72 @@
 {% extends 'recipeApp/base.html' %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-4">
     <h2 class="text-center mb-4">Search Results for "{{ query }}"</h2>
 
     {% if recipes %}
         {% for recipe in recipes %}
-        <div class="card mb-4 shadow-sm p-3">
-            <div class="row g-4">
+        <div class="row mb-5">
+            <!-- Left Section: Recipe Image, Details, and Ingredients -->
+            <div class="col-md-8">
+                <h1 class="mb-3">{{ recipe.recipe_name }}</h1>
                 
-                <!-- Recipe Image and Details (Left Side) -->
-                <div class="col-md-8">
-                    {% if recipe.image %}
-                        <img src="{{ recipe.image.url }}" class="img-fluid rounded recipe-img" alt="{{ recipe.recipe_name }}">
+                {% if recipe.image %}
+                    <img src="{{ recipe.image.url }}" class="img-fluid rounded shadow" alt="{{ recipe.recipe_name }}">
+                {% else %}
+                    <p class="text-muted">No image available</p>
+                {% endif %}
+                
+                <p class="mt-3"><strong>Time Needed:</strong> {{ recipe.time_needed }} minutes</p>
+
+                <!-- Average Rating -->
+                <h3 class="mt-3">Average Rating</h3>
+                <p class="fs-5">
+                    {% if recipe.average_rating %}
+                        ⭐ <strong>{{ recipe.average_rating|floatformat:1 }}</strong> / 5
                     {% else %}
-                        <p class="text-muted">No image available</p>
+                        <span class="text-muted">No ratings yet.</span>
                     {% endif %}
+                </p>
 
-                    <h3 class="mt-3">{{ recipe.recipe_name }}</h3>
-                    <p><strong>Time Needed:</strong> {{ recipe.time_needed }} minutes</p>
+                <!-- Ingredients List with Reduced Width -->
+                <h3 class="mt-4">Ingredients</h3>
+                <ul class="list-group" style="max-width: 75%;">
+                    {% for ingredient in recipe.ingredients %}
+                        <li class="list-group-item">{{ ingredient.ingredient_name }} - <strong>{{ ingredient.measure }}</strong></li>
+                    {% empty %}
+                        <p class="text-muted">No ingredients listed.</p>
+                    {% endfor %}
+                </ul>
 
-                    <!-- Star Rating -->
-                    <p>
-                        <strong>Rating:</strong>
-                        {% with full_stars=recipe.average_rating|floatformat:0 %}
-                            {% for _ in "★★★★★"|slice:full_stars %}
-                                ⭐
-                            {% endfor %}
-                            ({{ recipe.average_rating|floatformat:1 }} / 5)
-                        {% endwith %}
-                    </p>
-
-                    <h5>Ingredients:</h5>
-                    <ul class="list-group">
-                        {% for ingredient in recipe.ingredients %}
-                            <li class="list-group-item">{{ ingredient.ingredient_name }} - <strong>{{ ingredient.measure }}</strong></li>
-                        {% empty %}
-                            <p class="text-muted">No ingredients listed.</p>
-                        {% endfor %}
-                    </ul>
-
-                    <!-- Link to Comments Page -->
-                    <a href="{% url 'recipe_comments' recipe.id %}" class="btn btn-primary mt-3">💬 View/Add Comments</a>
+                <!-- View/Add Comments and Favorite Button Below Ingredients -->
+                <div class="text-center mt-3">
+                    <a href="{% url 'recipe_comments' recipe.id %}" class="btn btn-info">View Comments</a>
+                    <form action="{% url 'favorite_recipe' recipe.id %}" method="POST" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn {% if recipe.is_favorited %}btn-danger{% else %}btn-outline-primary{% endif %}">
+                            {% if recipe.is_favorited %}
+                                ❤️ Remove from Favorites
+                            {% else %}
+                                ⭐ Add to Favorites
+                            {% endif %}
+                        </button>
+                    </form>
                 </div>
+            </div>
 
-                <!-- Instructions (Right Side) -->
-                <div class="col-md-4 instructions-container">
-                    <h5>Instructions:</h5>
-                    <div class="accordion" id="recipeInstructions{{ recipe.id }}">
-                        {% for step in recipe.instructions %}
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="heading{{ recipe.id }}{{ forloop.counter }}">
-                                <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" 
-                                        type="button" data-bs-toggle="collapse" 
-                                        data-bs-target="#collapse{{ recipe.id }}{{ forloop.counter }}" 
-                                        aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" 
-                                        aria-controls="collapse{{ recipe.id }}{{ forloop.counter }}">
-                                    Step {{ step.step_no }}
-                                </button>
-                            </h2>
-                            <div id="collapse{{ recipe.id }}{{ forloop.counter }}" 
-                                 class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" 
-                                 aria-labelledby="heading{{ recipe.id }}{{ forloop.counter }}" 
-                                 data-bs-parent="#recipeInstructions{{ recipe.id }}">
-                                <div class="accordion-body">
-                                    {{ step.description }}
-                                </div>
-                            </div>
-                        </div>
-                        {% empty %}
-                            <p class="text-muted">No instructions available.</p>
-                        {% endfor %}
-                    </div>
-                </div>
-
+            <!-- Right Section: Instructions Only -->
+            <div class="col-md-4">
+                <h3 class="mt-4">Instructions</h3>
+                <ol class="list-group list-group-numbered">
+                    {% for step in recipe.instructions %}
+                        <li class="list-group-item">
+                            <strong>Step {{ step.step_no }}:</strong> {{ step.description }}
+                        </li>
+                    {% empty %}
+                        <p class="text-muted">No instructions available.</p>
+                    {% endfor %}
+                </ol>
             </div>
         </div>
         {% endfor %}
@@ -81,32 +74,4 @@
         <p class="text-center text-muted">No recipes found for "{{ query }}". Try a different search!</p>
     {% endif %}
 </div>
-
-<!-- CSS for Styling -->
-<style>
-    /* Recipe Image Styling */
-    .recipe-img {
-        width: 100%;
-        height: 300px;
-        object-fit: cover;
-        border-radius: 10px;
-    }
-
-    /* Move Instructions to Top Right on Larger Screens */
-    @media (min-width: 768px) {
-        .instructions-container {
-            align-self: flex-start;
-        }
-    }
-
-    /* Card Styling */
-    .card {
-        border-radius: 10px;
-        overflow: hidden;
-    }
-
-    .list-group-item {
-        border: none;
-    }
-</style>
 {% endblock %}

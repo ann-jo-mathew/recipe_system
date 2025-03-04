@@ -38,7 +38,12 @@
 
             <!-- View/Add Comments and Favorite Button Below Ingredients -->
             <div class="text-center mt-3">
-                <a href="{% url 'recipe_comments' recipe.id %}" class="btn btn-secondary">💬 View/Add Comments</a>
+                {% if recipe.id %}
+    <a href="{% url 'recipe_comments' recipe.id %}" class="btn btn-info">View Comments</a>
+{% else %}
+    <span class="text-muted">No comments available</span>
+{% endif %}
+
                 <form action="{% url 'favorite_recipe' recipe.id %}" method="POST" class="d-inline">
                     {% csrf_token %}
                     <button type="submit" class="btn {% if is_favorited %}btn-danger{% else %}btn-outline-primary{% endif %}">

@@ -67,14 +67,14 @@
     {% if user.is_authenticated %}
         <!-- Profile Picture -->
         <div class="profile-wrapper" style="position: relative; display: inline-block;">
-            <button class="profile-dropdown" onclick="toggleDropdown()" style="display: flex; align-items: center; background: none; border: none; cursor: pointer;">⌄
+            <button class="profile-dropdown" onclick="toggleDropdown()" style="display: flex; align-items: center; background: none; border: none; cursor: pointer;">
                 {% if user.profile.profile_picture %}
                     <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" width="40" height="40" style="border-radius: 50%; object-fit: cover;">
                 {% else %}
                     <img src="{% static 'recipeApp/img/default.jpg' %}" alt="Default Profile Picture" width="40" height="40" style="border-radius: 50%; object-fit: cover;">
                 {% endif %}
                 <span class="profile-name" style="font-size: 14px; font-weight: bold; color: #333; margin-left: 8px;">
-                    {{ user.username }}
+                    {{ user.username }}⌄
                 </span>
             </button>
         

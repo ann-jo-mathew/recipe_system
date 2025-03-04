@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.contrib import messages
 import logging
 from django.contrib.auth.decorators import login_required
-from .forms import UserProfileForm, RecipeForm
+from .forms import UserProfileForm
 from django.db.models import Avg
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
@@ -179,7 +179,8 @@ def recipe_detail(request, recipe_name):
     recipe = get_object_or_404(Recipe, recipe_name=recipe_name)
     instructions = Instruction.objects.filter(recipe=recipe).order_by('step_no')
     ingredients = Ingredient.objects.filter(recipe=recipe)
-    favorite_users = recipe.favorite_set.all().values_list('user', flat=True)
+    is_favorited = Favorite.objects.filter(user=request.user, recipe=recipe).exists()
+    favorite_users = Favorite.objects.filter(recipe=recipe).values_list('user', flat=True)
 
     context = {
         'recipe': recipe,
@@ -201,23 +202,49 @@ def recipe_comments(request, recipe_id):
     recipe = get_object_or_404(Recipe, id=recipe_id)
     comments = Rating.objects.filter(recipe=recipe)
 
+    # Check if the current user has already rated this recipe
+    user_comment = Rating.objects.filter(user=request.user, recipe=recipe).first()
+
     if request.method == "POST":
         rating = request.POST.get('rating')
         comment_text = request.POST.get('comment')
-        
-        # Save Comment
-        if rating and comment_text:
-            Rating.objects.create(
-                user=request.user,
-                recipe=recipe,
-                rating=int(rating),
-                comment=comment_text
-            )
 
-    return render(request, 'recipeApp/recipe-comments.html', {
+        if rating and comment_text:
+            if user_comment:  # If user already has a rating, update it
+                user_comment.rating = int(rating)
+                user_comment.comment = comment_text
+                user_comment.save()
+                messages.success(request, "Your rating and comment have been updated.")
+            else:  # Otherwise, create a new rating
+                Rating.objects.create(
+                    user=request.user,
+                    recipe=recipe,
+                    rating=int(rating),
+                    comment=comment_text
+                )
+                messages.success(request, "Your rating and comment have been added.")
+
+            return redirect('recipe_comments', recipe_id=recipe.id)
+
+    return render(request, 'recipeApp/recipe_comments.html', {
         'recipe': recipe,
-        'comments': comments
+        'comments': comments,
+        'user_comment': user_comment  # Send user's existing comment to template
     })
+
+
+
+@login_required
+def create_recipe(request):
+    if request.method == "POST":
+        form = RecipeForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('home')  # Redirect to home or recipe list
+    else:
+        form = RecipeForm()
+
+    return render(request, 'recipeApp/create_recipe.html', {'form': form})
 
 def upload_recipe(request):
     return render(request, 'recipeApp/upload_recipe.html')    
@@ -255,36 +282,3 @@ def about(request):
 
 def contact(request):
     return render(request, 'recipeApp/contact.html')
-
-@login_required
-def create_recipe(request):
-    if request.method == 'POST':
-        form = RecipeForm(request.POST, request.FILES)
-        if form.is_valid():
-            recipe = form.save(commit=False)
-            recipe.user = request.user  # Assign the logged-in user
-            recipe.save()
-
-            # Process Ingredients
-            ingredients_data = request.POST['ingredients'].split("\n")
-            for ingredient in ingredients_data:
-                try:
-                    name, measure = ingredient.split(" - ")
-                    Ingredient.objects.create(recipe=recipe, ingredient_name=name.strip(), measure=measure.strip())
-                except ValueError:
-                    continue  # Skip invalid input lines
-
-            # Process Instructions
-            instructions_data = request.POST['instructions'].split("\n")
-            for instruction in instructions_data:
-                try:
-                    step_no, description = instruction.split(": ")
-                    Instruction.objects.create(recipe=recipe, step_no=int(step_no.strip()), description=description.strip())
-                except ValueError:
-                    continue  # Skip invalid input lines
-
-            return redirect('recipe_detail', recipe.id)
-    else:
-        form = RecipeForm()
-
-    return render(request, 'recipeApp/create.html', {'form': form})

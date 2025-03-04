@@ -39,7 +39,7 @@
                 <!-- Recipe Image and Ingredients (Left Side) -->
                 <div class="col-md-8 order-md-1">
                     {% if recipe.image %}
-                        <img src="{{ recipe.image.url }}" class="img-fluid mb-3 recipe-img" alt="{{ recipe.recipe_name }}">
+                    <img src="{{ recipe.image.url }}" class="img-fluid rounded" alt="{{ recipe.recipe_name }}">
                     {% else %}
                         <p>No image available</p>
                     {% endif %}

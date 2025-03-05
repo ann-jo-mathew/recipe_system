@@ -3,40 +3,50 @@
 {% block content %}
 <div class="container mt-5">
     <h2>Add a New Recipe</h2>
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        
-        <div class="form-group">
-            <label for="recipe_name">Recipe Name:</label>
-            <input type="text" class="form-control" id="recipe_name" name="recipe_name" required>
-        </div>
 
-        <div class="form-group">
-            <label for="time_needed">Time Needed:</label>
-            <input type="text" class="form-control" id="time_needed" name="time_needed" required>
-        </div>
+    {% if user.is_authenticated %}
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="recipe_name">Recipe Name:</label>
+                <input type="text" class="form-control" id="recipe_name" name="recipe_name" required>
+            </div>
 
-        <div class="form-group">
-            <label for="serving_portion">Serving Portion:</label>
-            <input type="text" class="form-control" id="serving_portion" name="serving_portion" required>
-        </div>
+            <div class="form-group">
+                <label for="time_needed">Time Needed:</label>
+                <input type="text" class="form-control" id="time_needed" name="time_needed" required>
+            </div>
 
-        <div class="form-group">
-            <label for="image">Upload Image:</label>
-            <input type="file" class="form-control-file" id="image" name="image">
-        </div>
+            <div class="form-group">
+                <label for="serving_portion">Serving Portion:</label>
+                <input type="text" class="form-control" id="serving_portion" name="serving_portion" required>
+            </div>
 
-        <div class="form-group">
-            <label for="ingredients">Ingredients (Enter one per line as 'name - measure'):</label>
-            <textarea class="form-control" id="ingredients" name="ingredients" rows="4" required></textarea>
-        </div>
+            <div class="form-group">
+                <label for="image">Upload Image:</label>
+                <input type="file" class="form-control-file" id="image" name="image">
+            </div>
 
-        <div class="form-group">
-            <label for="instructions">Instructions (Enter one per line as 'Step No: Description'):</label>
-            <textarea class="form-control" id="instructions" name="instructions" rows="6" required></textarea>
-        </div>
-        
-        <button type="submit" class="btn btn-success">Submit Recipe</button>
-    </form>
+            <div class="form-group">
+                <label for="ingredients">Ingredients (Enter one per line as 'name - measure'):</label>
+                <textarea class="form-control" id="ingredients" name="ingredients" rows="4" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="instructions">Instructions (Enter one per line as 'Step No: Description'):</label>
+                <textarea class="form-control" id="instructions" name="instructions" rows="6" required></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-success">Submit Recipe</button>
+        </form>
+        {% else %}
+            <div class="alert alert-info text-center" style="background-color: rgba(173, 213, 169, 0.485);">
+                <h5>Want to share your own recipe? 🤩</h5>
+                <p>Log in now to upload and share your delicious recipes with the world!</p>
+                <a href="{% url 'loginuser' %}" class="btn btn-primary" style="background-color: rgb(19, 178, 19); border-color:rgb(19, 178, 19);">Login</a>
+                <a href="{% url 'signup' %}" class="btn btn-secondary" style="background-color: rgba(46, 43, 43, 0.841);">Sign Up</a>
+            </div>
+        {% endif %}   
 </div>
 {% endblock %}

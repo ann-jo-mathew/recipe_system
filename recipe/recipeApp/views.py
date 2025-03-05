@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.contrib import messages
 import logging
 from django.contrib.auth.decorators import login_required
-from .forms import UserProfileForm
+from .forms import UserProfileForm, RecipeForm
 from django.db.models import Avg
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
@@ -233,19 +233,57 @@ def recipe_comments(request, recipe_id):
     })
 
 
-
-@login_required
+#recipe upload
+""" @login_required """
 def create_recipe(request):
+    if not request.user.is_authenticated:
+        return render(request, "recipeApp/create.html")  # Show encouragement instead of redirecting
+
     if request.method == "POST":
+        recipe_name = request.POST['recipe_name']
+        time_needed = request.POST['time_needed']
+        serving_portion = request.POST['serving_portion']
+        image = request.FILES.get('image')
+
+        # Create and save recipe instance
+        recipe = Recipe.objects.create(
+            user=request.user,
+            recipe_name=recipe_name,
+            time_needed=time_needed,
+            serving_portion=serving_portion,
+            image=image
+        )
+
+        # Save Ingredients
+        ingredients = request.POST['ingredients'].split("\n")
+        for ingredient in ingredients:
+            if "-" in ingredient:
+                name, measure = ingredient.split("-", 1)
+                Ingredient.objects.create(recipe=recipe, ingredient_name=name.strip(), measure=measure.strip())
+
+        # Save Instructions
+        instructions = request.POST['instructions'].split("\n")
+        for instruction in instructions:
+            if ":" in instruction:
+                step_no, description = instruction.split(":", 1)
+                Instruction.objects.create(recipe=recipe, step_no=int(step_no.strip()), description=description.strip())
+
+        messages.success(request, "Recipe added successfully!")
+        return redirect("recipes")  # Redirect to recipes page after creation
+
+    return render(request, "recipeApp/create.html")
+    """ if request.method == "POST":
         form = RecipeForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            return redirect('home')  # Redirect to home or recipe list
+            recipe = form.save(commit=False)  # Don't save yet
+            recipe.user = request.user  # Assign the logged-in user
+            recipe.save()
+            return redirect('recipes')  # Redirect to recipe list or another page
     else:
         form = RecipeForm()
 
-    return render(request, 'recipeApp/create_recipe.html', {'form': form})
-
+    return render(request, 'recipeApp/create.html', {'form': form})
+ """
 def upload_recipe(request):
     return render(request, 'recipeApp/upload_recipe.html')    
 

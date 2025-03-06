@@ -1,20 +1,44 @@
 {% extends 'recipeApp/base.html' %}
 
 {% block content %}
-    <center>
-        <h2>Your Favorite Recipes</h2>
+<button onclick="history.back()" 
+        style="border: none;
+                left: 1cm; 
+               background: none; 
+               font-size: 1.5rem; 
+               cursor: pointer;">
+    🔙
+</button>
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Your Favorite Recipes</h2>
+
+    {% if user.is_authenticated %}
         {% if favorite_recipes %}
-            <ul>
+            <div class="row">
                 {% for recipe in favorite_recipes %}
-                    <li>
-                        <a href="{% url 'recipe_detail' recipe.recipe_name %}">
-                            {{ recipe.recipe_name }}
-                        </a>
-                    </li>
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow-sm">
+                            <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.recipe_name }}">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">{{ recipe.recipe_name }}</h5>
+                                <a href="{% url 'recipe_detail' recipe_name=recipe.recipe_name %}" class="btn btn-success">View Recipe</a>
+                            </div>
+                        </div>
+                    </div>
                 {% endfor %}
-            </ul>
+            </div>
         {% else %}
-            <p>You haven't favorited any recipes yet.</p>
+            <p class="text-muted text-center">You haven't favorited any recipes yet.</p>
         {% endif %}
-    </center>
+    {% else %}
+        <!-- Show login message for non-logged-in users -->
+        <div class="alert alert-info text-center mt-4" style="background-color: rgba(173, 213, 169, 0.485);">
+            <h5>Want to save your favorite recipes? 🤩</h5>
+            <p>Log in now to bookmark and revisit your favorite dishes. Happy Cooking!</p>
+            <a href="{% url 'loginuser' %}" class="btn btn-primary" style="background-color: rgb(19, 178, 19); border-color:rgb(19, 178, 19);">Login</a>
+            <a href="{% url 'signup' %}" class="btn btn-secondary" style="background-color: rgba(46, 43, 43, 0.841);">Sign Up</a>
+        </div>
+    {% endif %}
+</div>
 {% endblock %}

@@ -179,14 +179,15 @@ def recipe_detail(request, recipe_name):
     recipe = get_object_or_404(Recipe, recipe_name=recipe_name)
     instructions = Instruction.objects.filter(recipe=recipe).order_by('step_no')
     ingredients = Ingredient.objects.filter(recipe=recipe)
-    is_favorited = Favorite.objects.filter(user=request.user, recipe=recipe).exists()
+    
+    # Ensure user is authenticated before querying Favorite
+    if request.user.is_authenticated:
+        is_favorited = Favorite.objects.filter(user=request.user, recipe=recipe).exists()
+    else:
+        is_favorited = False  # Anonymous users can't have favorites
+
     favorite_users = Favorite.objects.filter(recipe=recipe).values_list('user', flat=True)
 
-    context = {
-        'recipe': recipe,
-        'favorite_users': favorite_users,  # Pass this to the template
-    }
-    
     # Calculate average rating
     average_rating = Rating.objects.filter(recipe=recipe).aggregate(Avg('rating'))['rating__avg'] or 0
 
@@ -194,28 +195,36 @@ def recipe_detail(request, recipe_name):
         'recipe': recipe,
         'instructions': instructions,
         'ingredients': ingredients,
-        'average_rating': average_rating
+        'average_rating': average_rating,
+        'is_favorited': is_favorited,  # Pass this to the template
+        'favorite_users': favorite_users,
     })
+
 
 
 def recipe_comments(request, recipe_id):
     recipe = get_object_or_404(Recipe, id=recipe_id)
     comments = Rating.objects.filter(recipe=recipe)
 
-    # Check if the current user has already rated this recipe
-    user_comment = Rating.objects.filter(user=request.user, recipe=recipe).first()
+    user_comment = None
+    if request.user.is_authenticated:
+        user_comment = Rating.objects.filter(user=request.user, recipe=recipe).first()
 
     if request.method == "POST":
+        if not request.user.is_authenticated:
+            messages.error(request, "You must be logged in to comment.")
+            return redirect('loginuser')  # Redirect to login page
+
         rating = request.POST.get('rating')
         comment_text = request.POST.get('comment')
 
         if rating and comment_text:
-            if user_comment:  # If user already has a rating, update it
+            if user_comment:
                 user_comment.rating = int(rating)
                 user_comment.comment = comment_text
                 user_comment.save()
                 messages.success(request, "Your rating and comment have been updated.")
-            else:  # Otherwise, create a new rating
+            else:
                 Rating.objects.create(
                     user=request.user,
                     recipe=recipe,
@@ -229,7 +238,7 @@ def recipe_comments(request, recipe_id):
     return render(request, 'recipeApp/recipe_comments.html', {
         'recipe': recipe,
         'comments': comments,
-        'user_comment': user_comment  # Send user's existing comment to template
+        'user_comment': user_comment
     })
 
 
@@ -287,20 +296,22 @@ def create_recipe(request):
 def upload_recipe(request):
     return render(request, 'recipeApp/upload_recipe.html')    
 
-@login_required
 def favorite_recipe(request, recipe_id):
     recipe = get_object_or_404(Recipe, id=recipe_id)
-    favorite, created = Favorite.objects.get_or_create(user=request.user, recipe=recipe)
 
-    if not created:
-        # If already favorited, remove from favorites
-        favorite.delete()
-    
-    return redirect('recipe_detail', recipe_name=recipe.recipe_name) 
+    if request.user.is_authenticated:
+        favorite, created = Favorite.objects.get_or_create(user=request.user, recipe=recipe)
 
-@login_required
+        if not created:
+            # If already favorited, remove from favorites
+            favorite.delete()
+
+        return redirect('recipe_detail', recipe_name=recipe.recipe_name)  # Redirect to recipe detail if logged in
+    else:
+        return redirect('favorites')  # Redirect to favorites page if not logged in
+
 def favorites(request):
-    favorite_recipes = Recipe.objects.filter(favorite__user=request.user)
+    favorite_recipes = Recipe.objects.filter(favorite__user=request.user) if request.user.is_authenticated else None
     return render(request, 'recipeApp/favorites.html', {'favorite_recipes': favorite_recipes})
   
 def recipe_list(request):    

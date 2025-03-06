@@ -256,6 +256,46 @@ def recipe_comments(request, recipe_id):
 """ @login_required """
 def create_recipe(request):
     if not request.user.is_authenticated:
+        return render(request, "recipeApp/create.html")
+
+    if request.method == "POST":
+        form = RecipeForm(request.POST, request.FILES)
+        if form.is_valid():
+            recipe = form.save(commit=False)  # Create a recipe object but don't save yet
+            recipe.user = request.user  # Assign the logged-in user
+            recipe.save()  # Now save the recipe
+
+            # Save Ingredients
+            ingredients = request.POST.get("ingredients", "").split("\n")
+            for ingredient in ingredients:
+                if "-" in ingredient:
+                    name, measure = ingredient.split("-", 1)
+                    Ingredient.objects.create(
+                        recipe=recipe,
+                        ingredient_name=name.strip(),
+                        measure=measure.strip()
+                    )
+
+            # Save Instructions
+            instructions = request.POST.get("instructions", "").split("\n")
+            for instruction in instructions:
+                if ":" in instruction:
+                    step_no, description = instruction.split(":", 1)
+                    Instruction.objects.create(
+                        recipe=recipe,
+                        step_no=int(step_no.strip()),
+                        description=description.strip()
+                    )
+
+            messages.success(request, "Recipe added successfully!")
+            return redirect("recipes")  # Redirect to the recipes list page
+
+    else:
+        form = RecipeForm()
+
+    return render(request, "recipeApp/create.html", {"form": form})
+""" def create_recipe(request):
+    if not request.user.is_authenticated:
         return render(request, "recipeApp/create.html")  # Show encouragement instead of redirecting
 
     if request.method == "POST":
@@ -290,19 +330,19 @@ def create_recipe(request):
         messages.success(request, "Recipe added successfully!")
         return redirect("recipes")  # Redirect to recipes page after creation
 
-    return render(request, "recipeApp/create.html")
-    """ if request.method == "POST":
-        form = RecipeForm(request.POST, request.FILES)
-        if form.is_valid():
-            recipe = form.save(commit=False)  # Don't save yet
-            recipe.user = request.user  # Assign the logged-in user
-            recipe.save()
-            return redirect('recipes')  # Redirect to recipe list or another page
-    else:
-        form = RecipeForm()
+    return render(request, "recipeApp/create.html") """
+""" if request.method == "POST":
+    form = RecipeForm(request.POST, request.FILES)
+    if form.is_valid():
+        recipe = form.save(commit=False)  # Don't save yet
+        recipe.user = request.user  # Assign the logged-in user
+        recipe.save()
+        return redirect('recipes')  # Redirect to recipe list or another page
+else:
+    form = RecipeForm()
 
-    return render(request, 'recipeApp/create.html', {'form': form})
- """
+return render(request, 'recipeApp/create.html', {'form': form})
+"""
 def upload_recipe(request):
     return render(request, 'recipeApp/upload_recipe.html')    
 

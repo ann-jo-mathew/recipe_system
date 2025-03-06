@@ -33,7 +33,7 @@
                             <div class="hero-slides-content">
                                 <h2 >Cook, Share, and Inspire!</h2>
                                 <p >Cook your own delicious meals, share your favorite recipes, and inspire others—whether you're a home cook, a chef, or just love exploring new flavors!</p>
-                                <a href="#" class="btn delicious-btn">See Receipe</a>
+                                <!--<a href="#" class="btn delicious-btn">See Receipe</a>-->
                             </div>
                         </div>
                     </div>
@@ -70,8 +70,8 @@
                             <!--{{recipe.image.url}}-->
                                 <img src="{{recipe.image.url}}" alt="{{ recipe.recipe_name }}">
                                 <div class="receipe-content">
-                                    <a href="{% url 'recipe_detail' recipe_name=recipe.recipe_name %}"></a>
-                                        <h5>{{ recipe.recipe_name }}</h5>
+                                    <a href="{% url 'recipe_detail' recipe_name=recipe.recipe_name %}">
+                        <h2 style="font-size:20px;">{{ recipe.recipe_name }}</h2></a>
                                         <p>Time Needed: {{ recipe.time_needed }}</p>
                                         <!-- <a href="{% url 'recipe_detail' recipe_name=recipe.recipe_name %}">View Details</a>-->
                                    <!--</a> -->
@@ -113,7 +113,7 @@
                     <div class="cta-content text-center">
                         <h2>Share Your Delicious Creations</h2>
                         <p>Have a unique recipe? Upload it and inspire others! Whether it’s a family secret or a creative twist, share your cooking ideas with the world. Join our community and help others discover new flavors.</p>
-                        <a href="#" class="btn delicious-btn">Discover all the receipies</a>
+                        <a href="{% url 'recipes' %}" class="btn delicious-btn">Discover all the receipies</a>
                     </div>
                 </div>
             </div>
@@ -122,238 +122,41 @@
     <!-- ##### CTA Area End ##### -->
 
     <!-- ##### Small Receipe Area Start ##### -->
-    <section class="small-receipe-area section-padding-80-0">
-        <div class="container">
-            <div class="row">
-
-                <!-- Small Receipe Area -->
-                <div class="col-12 col-sm-6 col-lg-4">
-                    <div class="single-small-receipe-area d-flex">
-                        <!-- Receipe Thumb -->
-                        <div class="receipe-thumb">
-                            <img src="{% static 'recipeApp/img/bg-img/sr1.jpg' %}" alt="">
-                        </div>
-                        <!-- Receipe Content -->
-                        <div class="receipe-content">
-                            <span>January 04, 2018</span>
-                            <a href="receipe-post.html">
-                                <h5>Homemade italian pasta</h5>
-                            </a>
-                            <div class="ratings">
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star-o" aria-hidden="true"></i>
-                            </div>
-                            <p>2 Comments</p>
-                        </div>
+<section class="small-receipe-area section-padding-80-0">
+    <div class="container">
+        <div class="row">
+            {% for recipe in top_recipes %}
+            <!-- Small Receipe Area -->
+            <div class="col-12 col-sm-6 col-lg-4">
+                <div class="single-small-receipe-area d-flex">
+                    <!-- Receipe Thumb -->
+                    <div class="receipe-thumb">
+                        <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
                     </div>
-                </div>
-
-                <!-- Small Receipe Area -->
-                <div class="col-12 col-sm-6 col-lg-4">
-                    <div class="single-small-receipe-area d-flex">
-                        <!-- Receipe Thumb -->
-                        <div class="receipe-thumb">
-                            <img src="{% static 'recipeApp/img/bg-img/sr2.jpg' %}" alt="">
-                        </div>
-                        <!-- Receipe Content -->
-                        <div class="receipe-content">
-                            <span>January 04, 2018</span>
-                            <a href="receipe-post.html">
-                                <h5>Baked Bread</h5>
-                            </a>
-                            <div class="ratings">
+                    <!-- Receipe Content -->
+                    <div class="receipe-content">
+                        <span>{{ recipe.created_at|date:"F d, Y" }}</span>
+                        <a href="{% url 'recipe_detail' recipe.id %}">
+                            <h5>{{ recipe.title }}</h5>
+                        </a>
+                        <div class="ratings">
+                            {% for _ in "x"|rjust:recipe.full_stars %}
                                 <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star" aria-hidden="true"></i>
+                            {% endfor %}
+                            {% for _ in "x"|rjust:recipe.empty_stars %}
                                 <i class="fa fa-star-o" aria-hidden="true"></i>
-                            </div>
-                            <p>2 Comments</p>
+                            {% endfor %}
                         </div>
-                    </div>
-                </div>
-
-                <!-- Small Receipe Area -->
-                <div class="col-12 col-sm-6 col-lg-4">
-                    <div class="single-small-receipe-area d-flex">
-                        <!-- Receipe Thumb -->
-                        <div class="receipe-thumb">
-                            <img src="{% static 'recipeApp/img/bg-img/sr3.jpg' %}" alt="">
-                        </div>
-                        <!-- Receipe Content -->
-                        <div class="receipe-content">
-                            <span>January 04, 2018</span>
-                            <a href="receipe-post.html">
-                                <h5>Scalops on salt</h5>
-                            </a>
-                            <div class="ratings">
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star-o" aria-hidden="true"></i>
-                            </div>
-                            <p>2 Comments</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Small Receipe Area -->
-                <div class="col-12 col-sm-6 col-lg-4">
-                    <div class="single-small-receipe-area d-flex">
-                        <!-- Receipe Thumb -->
-                        <div class="receipe-thumb">
-                            <img src="{% static 'recipeApp/img/bg-img/sr4.jpg' %}" alt="">
-                        </div>
-                        <!-- Receipe Content -->
-                        <div class="receipe-content">
-                            <span>January 04, 2018</span>
-                            <a href="receipe-post.html">
-                                <h5>Fruits on plate</h5>
-                            </a>
-                            <div class="ratings">
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star-o" aria-hidden="true"></i>
-                            </div>
-                            <p>2 Comments</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Small Receipe Area -->
-                <div class="col-12 col-sm-6 col-lg-4">
-                    <div class="single-small-receipe-area d-flex">
-                        <!-- Receipe Thumb -->
-                        <div class="receipe-thumb">
-                            <img src="{% static 'recipeApp/img/bg-img/sr5.jpg' %}" alt="">
-                        </div>
-                        <!-- Receipe Content -->
-                        <div class="receipe-content">
-                            <span>January 04, 2018</span>
-                            <a href="receipe-post.html">
-                                <h5>Macaroons</h5>
-                            </a>
-                            <div class="ratings">
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star-o" aria-hidden="true"></i>
-                            </div>
-                            <p>2 Comments</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Small Receipe Area -->
-                <div class="col-12 col-sm-6 col-lg-4">
-                    <div class="single-small-receipe-area d-flex">
-                        <!-- Receipe Thumb -->
-                        <div class="receipe-thumb">
-                            <img src="{% static 'recipeApp/img/bg-img/sr6.jpg' %}" alt="">
-                        </div>
-                        <!-- Receipe Content -->
-                        <div class="receipe-content">
-                            <span>January 04, 2018</span>
-                            <a href="receipe-post.html">
-                                <h5>Chocolate tart</h5>
-                            </a>
-                            <div class="ratings">
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star-o" aria-hidden="true"></i>
-                            </div>
-                            <p>2 Comments</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Small Receipe Area -->
-                <div class="col-12 col-sm-6 col-lg-4">
-                    <div class="single-small-receipe-area d-flex">
-                        <!-- Receipe Thumb -->
-                        <div class="receipe-thumb">
-                            <img src="{% static 'recipeApp/img/bg-img/sr7.jpg' %}" alt="">
-                        </div>
-                        <!-- Receipe Content -->
-                        <div class="receipe-content">
-                            <span>January 04, 2018</span>
-                            <a href="receipe-post.html">
-                                <h5>Berry Desert</h5>
-                            </a>
-                            <div class="ratings">
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star-o" aria-hidden="true"></i>
-                            </div>
-                            <p>2 Comments</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Small Receipe Area -->
-                <div class="col-12 col-sm-6 col-lg-4">
-                    <div class="single-small-receipe-area d-flex">
-                        <!-- Receipe Thumb -->
-                        <div class="receipe-thumb">
-                            <img src="{% static 'recipeApp/img/bg-img/sr8.jpg' %}" alt="">
-                        </div>
-                        <!-- Receipe Content -->
-                        <div class="receipe-content">
-                            <span>January 04, 2018</span>
-                            <a href="receipe-post.html">
-                                <h5>Zucchini Grilled on peper</h5>
-                            </a>
-                            <div class="ratings">
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star-o" aria-hidden="true"></i>
-                            </div>
-                            <p>2 Comments</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Small Receipe Area -->
-                <div class="col-12 col-sm-6 col-lg-4">
-                    <div class="single-small-receipe-area d-flex">
-                        <!-- Receipe Thumb -->
-                        <div class="receipe-thumb">
-                            <img src="{% static 'recipeApp/img/bg-img/sr9.jpg' %}" alt="">
-                        </div>
-                        <!-- Receipe Content -->
-                        <div class="receipe-content">
-                            <span>January 04, 2018</span>
-                            <a href="receipe-post.html">
-                                <h5>Chicken Salad</h5>
-                            </a>
-                            <div class="ratings">
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <i class="fa fa-star-o" aria-hidden="true"></i>
-                            </div>
-                            <p>2 Comments</p>
-                        </div>
+                        <p>{{ recipe.comments.count }} Comments</p>
                     </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
-    </section>
-    <!-- ##### Small Receipe Area End ##### -->
+    </div>
+</section>
+<!-- ##### Small Receipe Area End ##### -->
+
 
     <!-- ##### Quote Subscribe Area Start ##### -->
     

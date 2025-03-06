@@ -151,6 +151,16 @@ def search_recipe(request):
 def about(request):
     return render(request, 'recipeApp/about.html')
 
+def best_rated_recipes(request):
+    # Get the top 9 recipes based on average rating
+    top_recipes = Recipe.objects.all().annotate(avg_rating=Avg('rating__rating')).order_by('-avg_rating')[:9]
+
+    # Convert avg_rating to full_stars and empty_stars
+    for recipe in top_recipes:
+        recipe.full_stars = int(recipe.avg_rating) if recipe.avg_rating else 0
+        recipe.empty_stars = 5 - recipe.full_stars
+
+    return render(request, 'recipeApp/best_recipes.html', {'top_recipes': top_recipes})
 
 #@login_required(login_url='/login/')
 

@@ -24,7 +24,8 @@ urlpatterns = [
     path('recipe/<int:recipe_id>/comments/', views.recipe_comments, name='recipe_comments'),
     path('about/', views.about, name='about'),
     path('contact/', views.contact, name='contact'),
-     path('create/', views.create_recipe, name='create_recipe'),
+    path('top-rated/', views.best_rated_recipes, name='top_rated_recipes'),
+    path('create/', views.create_recipe, name='create_recipe'),
 ]
 
 if settings.DEBUG:  # Only serve media files in development

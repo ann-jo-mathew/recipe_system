@@ -28,25 +28,106 @@
                 <input type="file" class="form-control-file" id="image" name="image">
             </div>
 
+            <!-- Ingredients Section -->
             <div class="form-group">
-                <label for="ingredients">Ingredients (Enter one per line as 'name - measure'):</label>
-                <textarea class="form-control" id="ingredients" name="ingredients" rows="4" required></textarea>
+                <label>Ingredients:</label>
+                <div id="ingredients-list" class="mb-2"></div>
+                <div class="d-flex">
+                    <input type="text" class="form-control mr-2" id="ingredient_name" placeholder="Ingredient Name">
+                    <input type="text" class="form-control mr-2" id="ingredient_measure" placeholder="Measure (e.g., 1 cup)">
+                    <button type="button" class="btn btn-sm btn-primary" onclick="addIngredient()">Add</button>
+                </div>
+                <input type="hidden" name="ingredients" id="ingredients_input">
             </div>
 
+            <!-- Instructions Section -->
             <div class="form-group">
-                <label for="instructions">Instructions (Enter one per line as 'Step No: Description'):</label>
-                <textarea class="form-control" id="instructions" name="instructions" rows="6" required></textarea>
+                <label>Instructions:</label>
+                <div id="instructions-list" class="mb-2"></div>
+                <div class="d-flex">
+                    <input type="text" class="form-control mr-2" id="instruction_step" placeholder="Step description">
+                    <button type="button" class="btn btn-sm btn-primary" onclick="addInstruction()">Add</button>
+                </div>
+                <input type="hidden" name="instructions" id="instructions_input">
             </div>
-            
-            <button type="submit" class="btn btn-success">Submit Recipe</button>
+
+            <button type="submit" class="btn btn-success mt-3">Submit Recipe</button>
         </form>
-        {% else %}
-            <div class="alert alert-info text-center" style="background-color: rgba(173, 213, 169, 0.485);">
-                <h5>Want to share your own recipe? 🤩</h5>
-                <p>Log in now to upload and share your delicious recipes with the world!</p>
-                <a href="{% url 'loginuser' %}" class="btn btn-primary" style="background-color: rgb(19, 178, 19); border-color:rgb(19, 178, 19);">Login</a>
-                <a href="{% url 'signup' %}" class="btn btn-secondary" style="background-color: rgba(46, 43, 43, 0.841);">Sign Up</a>
-            </div>
-        {% endif %}   
+
+        <!-- JavaScript Code -->
+        <script>
+            let ingredients = [];
+            let instructions = [];
+
+            function addIngredient() {
+    let name = document.getElementById("ingredient_name").value.trim();
+    let measure = document.getElementById("ingredient_measure").value.trim();
+
+    if (name && measure) {
+        let ingredient = `${name} - ${measure}`;
+        ingredients.push(ingredient);
+        updateIngredientList();
+        document.getElementById("ingredients_input").value = ingredients.join("\n"); // Store correctly
+        document.getElementById("ingredient_name").value = "";
+        document.getElementById("ingredient_measure").value = "";
+    }
+}
+
+            function updateIngredientList() {
+                let list = document.getElementById("ingredients-list");
+                list.innerHTML = "";
+                ingredients.forEach((item, index) => {
+                    list.innerHTML += `
+                        <div class="d-flex justify-content-between align-items-center border p-2 mb-1">
+                            <span>${index + 1}. ${item}</span>
+                            <button type="button" class="btn btn-sm btn-danger" onclick="removeIngredient(${index})">X</button>
+                        </div>`;
+                });
+                document.getElementById("ingredients_input").value = ingredients.join("\n");
+            }
+
+            function removeIngredient(index) {
+                ingredients.splice(index, 1);
+                updateIngredientList();
+            }
+
+            function addInstruction() {
+    let step = document.getElementById("instruction_step").value.trim();
+
+    if (step) {
+        let instruction = `Step ${instructions.length + 1}: ${step}`;
+        instructions.push(instruction);
+        updateInstructionList();
+        document.getElementById("instructions_input").value = instructions.join("\n"); // Store correctly
+        document.getElementById("instruction_step").value = "";
+    }
+}
+            function updateInstructionList() {
+                let list = document.getElementById("instructions-list");
+                list.innerHTML = "";
+                instructions.forEach((item, index) => {
+                    list.innerHTML += `
+                        <div class="d-flex justify-content-between align-items-center border p-2 mb-1">
+                            <span>${item}</span>
+                            <button type="button" class="btn btn-sm btn-danger" onclick="removeInstruction(${index})">X</button>
+                        </div>`;
+                });
+                document.getElementById("instructions_input").value = instructions.join("\n");
+            }
+
+            function removeInstruction(index) {
+                instructions.splice(index, 1);
+                updateInstructionList();
+            }
+        </script>
+
+    {% else %}
+        <div class="alert alert-info text-center" style="background-color: rgba(173, 213, 169, 0.485);">
+            <h5>Want to share your own recipe? 🤩</h5>
+            <p>Log in now to upload and share your delicious recipes with the world!</p>
+            <a href="{% url 'loginuser' %}" class="btn btn-primary" style="background-color: rgb(19, 178, 19); border-color:rgb(19, 178, 19);">Login</a>
+            <a href="{% url 'signup' %}" class="btn btn-secondary" style="background-color: rgba(46, 43, 43, 0.841);">Sign Up</a>
+        </div>
+    {% endif %}
 </div>
 {% endblock %}

@@ -81,6 +81,7 @@
             <!-- Dropdown Menu -->
             <div id="profileDropdown" class="dropdown-menu" style="display: none; position: absolute; right: 0; top: 50px; background: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); min-width: 160px; border-radius: 5px; overflow: hidden; z-index: 1000;">
                 <a href="{% url 'user_profile' %}" style="display: block; padding: 10px 15px; text-decoration: none; color: #333; font-size: 14px;">View Profile</a>
+                <a href="{% url 'my_recipes' %}" style="display: block; padding: 10px 15px; text-decoration: none; color: #333; font-size: 14px;">My Recipes</a>
                 <a href="{% url 'favorites' %}" style="display: block; padding: 10px 15px; text-decoration: none; color: #333; font-size: 14px;">Favorite Recipes</a>
                 <form action="{% url 'logout' %}" method="post" style="display: block; margin: 0; padding: 0;">
                     {% csrf_token %}

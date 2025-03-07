@@ -1,0 +1,143 @@
+{% extends 'recipeApp/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Edit Recipe</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Recipe Name -->
+        <div class="form-group">
+            <label for="recipe_name">Recipe Name:</label>
+            <input type="text" class="form-control" id="recipe_name" name="recipe_name" value="{{ recipe.recipe_name }}" required>
+        </div>
+
+        <!-- Time Needed -->
+        <div class="form-group">
+            <label for="time_needed">Time Needed:</label>
+            <input type="text" class="form-control" id="time_needed" name="time_needed" value="{{ recipe.time_needed }}" required>
+        </div>
+
+        <!-- Serving Portion -->
+        <div class="form-group">
+            <label for="serving_portion">Serving Portion:</label>
+            <input type="text" class="form-control" id="serving_portion" name="serving_portion" value="{{ recipe.serving_portion }}" required>
+        </div>
+
+        <!-- Image Upload -->
+        <div class="form-group">
+            <label for="image">Recipe Image:</label>
+            {% if recipe.image %}
+                <div class="mb-2">
+                    <img src="{{ recipe.image.url }}" alt="Recipe Image" class="img-thumbnail" width="200">
+                </div>
+            {% endif %}
+            <input type="file" class="form-control-file" id="image" name="image">
+        </div>
+
+        <!-- Ingredients Section -->
+        <div class="form-group">
+            <label>Ingredients:</label>
+            <div id="ingredients-list" class="mb-2">
+                {% for ingredient in ingredients %}
+                    <div class="d-flex justify-content-between align-items-center border p-2 mb-1">
+                        <span>{{ ingredient.ingredient_name }} - {{ ingredient.measure }}</span>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="removeIngredient({{ forloop.counter0 }})">X</button>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="d-flex">
+                <input type="text" class="form-control mr-2" id="ingredient_name" placeholder="Ingredient Name">
+                <input type="text" class="form-control mr-2" id="ingredient_measure" placeholder="Measure (e.g., 1 cup)">
+                <button type="button" class="btn btn-sm btn-primary" onclick="addIngredient()">Add</button>
+            </div>
+            <input type="hidden" name="ingredients" id="ingredients_input" value="{% for ingredient in ingredients %}{{ ingredient.ingredient_name }} - {{ ingredient.measure }}\n{% endfor %}">
+        </div>
+
+        <!-- Instructions Section -->
+        <div class="form-group">
+            <label>Instructions:</label>
+            <div id="instructions-list" class="mb-2">
+                {% for instruction in instructions %}
+                    <div class="d-flex justify-content-between align-items-center border p-2 mb-1">
+                        <span>Step {{ instruction.step_no }}: {{ instruction.description }}</span>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="removeInstruction({{ forloop.counter0 }})">X</button>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="d-flex">
+                <input type="text" class="form-control mr-2" id="instruction_step" placeholder="Step description">
+                <button type="button" class="btn btn-sm btn-primary" onclick="addInstruction()">Add</button>
+            </div>
+            <input type="hidden" name="instructions" id="instructions_input" value="{% for instruction in instructions %}Step {{ instruction.step_no }}: {{ instruction.description }}\n{% endfor %}">
+        </div>
+
+        <button type="submit" class="btn btn-success mt-3">Update Recipe</button>
+    </form>
+
+    <!-- JavaScript Code -->
+    <script>
+        let ingredients = `{% for ingredient in ingredients %}{{ ingredient.ingredient_name }} - {{ ingredient.measure }}\n{% endfor %}`.trim().split("\n").filter(Boolean);
+        let instructions = `{% for instruction in instructions %}Step {{ instruction.step_no }}: {{ instruction.description }}\n{% endfor %}`.trim().split("\n").filter(Boolean);
+
+        function updateIngredientList() {
+            let list = document.getElementById("ingredients-list");
+            list.innerHTML = "";
+            ingredients.forEach((item, index) => {
+                list.innerHTML += `
+                    <div class="d-flex justify-content-between align-items-center border p-2 mb-1">
+                        <span>${index + 1}. ${item}</span>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="removeIngredient(${index})">X</button>
+                    </div>`;
+            });
+            document.getElementById("ingredients_input").value = ingredients.join("\n");
+        }
+
+        function addIngredient() {
+            let name = document.getElementById("ingredient_name").value.trim();
+            let measure = document.getElementById("ingredient_measure").value.trim();
+            if (name && measure) {
+                let ingredient = `${name} - ${measure}`;
+                ingredients.push(ingredient);
+                updateIngredientList();
+                document.getElementById("ingredient_name").value = "";
+                document.getElementById("ingredient_measure").value = "";
+            }
+        }
+
+        function removeIngredient(index) {
+            ingredients.splice(index, 1);
+            updateIngredientList();
+        }
+
+        function updateInstructionList() {
+            let list = document.getElementById("instructions-list");
+            list.innerHTML = "";
+            instructions.forEach((item, index) => {
+                list.innerHTML += `
+                    <div class="d-flex justify-content-between align-items-center border p-2 mb-1">
+                        <span>${item}</span>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="removeInstruction(${index})">X</button>
+                    </div>`;
+            });
+            document.getElementById("instructions_input").value = instructions.join("\n");
+        }
+
+        function addInstruction() {
+            let step = document.getElementById("instruction_step").value.trim();
+            if (step) {
+                let instruction = `Step ${instructions.length + 1}: ${step}`;
+                instructions.push(instruction);
+                updateInstructionList();
+                document.getElementById("instruction_step").value = "";
+            }
+        }
+
+        function removeInstruction(index) {
+            instructions.splice(index, 1);
+            updateInstructionList();
+        }
+    </script>
+</div>
+{% endblock %}

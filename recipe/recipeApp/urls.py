@@ -25,6 +25,9 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     path('contact/', views.contact, name='contact'),
     path('top-rated/', views.best_rated_recipes, name='top_rated_recipes'),
+    path("my-recipes/", views.my_recipes, name="my_recipes"),
+    path("edit-recipe/<int:recipe_id>/", views.edit_recipe, name="edit_recipe"),
+    path("delete_recipe/<int:recipe_id>/", views.delete_recipe, name="delete_recipe"),
     path('create/', views.create_recipe, name='create_recipe'),
 ]
 

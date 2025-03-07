@@ -251,49 +251,45 @@ def recipe_comments(request, recipe_id):
         'user_comment': user_comment
     })
 
-
-#recipe upload
-""" @login_required """
 def create_recipe(request):
-    if not request.user.is_authenticated:
-        return render(request, "recipeApp/create.html")
+    if request.method == 'POST':
+        recipe_name = request.POST.get('recipe_name')
+        time_needed = request.POST.get('time_needed')
+        serving_portion = request.POST.get('serving_portion')
+        image = request.FILES.get('image')
 
-    if request.method == "POST":
-        form = RecipeForm(request.POST, request.FILES)
-        if form.is_valid():
-            recipe = form.save(commit=False)  # Create a recipe object but don't save yet
-            recipe.user = request.user  # Assign the logged-in user
-            recipe.save()  # Now save the recipe
+        # ✅ Check if the recipe name already exists for this user
+        if Recipe.objects.filter(user=request.user, recipe_name=recipe_name).exists():
+            messages.error(request, "You already have a recipe with this name. Please choose a different name.")
+            return render(request, 'recipeApp/create.html')
 
-            # Save Ingredients
-            ingredients = request.POST.get("ingredients", "").split("\n")
-            for ingredient in ingredients:
-                if "-" in ingredient:
-                    name, measure = ingredient.split("-", 1)
-                    Ingredient.objects.create(
-                        recipe=recipe,
-                        ingredient_name=name.strip(),
-                        measure=measure.strip()
-                    )
+        # ✅ Create the recipe
+        recipe = Recipe.objects.create(
+            user=request.user,
+            recipe_name=recipe_name,
+            time_needed=time_needed,
+            serving_portion=serving_portion,
+            image=image
+        )
 
-            # Save Instructions
-            instructions = request.POST.get("instructions", "").split("\n")
-            for instruction in instructions:
-                if ":" in instruction:
-                    step_no, description = instruction.split(":", 1)
-                    Instruction.objects.create(
-                        recipe=recipe,
-                        step_no=int(step_no.strip()),
-                        description=description.strip()
-                    )
+        # ✅ Get ingredients and instructions
+        ingredients_raw = request.POST.get('ingredients', '').split("\n")
+        instructions_raw = request.POST.get('instructions', '').split("\n")
 
-            messages.success(request, "Recipe added successfully!")
-            return redirect("recipes")  # Redirect to the recipes list page
+        # ✅ Save ingredients
+        for ingredient in ingredients_raw:
+            if " - " in ingredient:
+                name, measure = ingredient.split(" - ")
+                Ingredient.objects.create(recipe=recipe, ingredient_name=name.strip(), measure=measure.strip())
 
-    else:
-        form = RecipeForm()
+        # ✅ Save instructions
+        for step_no, instruction in enumerate(instructions_raw, start=1):
+            Instruction.objects.create(recipe=recipe, step_no=step_no, description=instruction.strip())
 
-    return render(request, "recipeApp/create.html", {"form": form})
+        messages.success(request, "Recipe created successfully!")
+        return redirect('index')
+
+    return render(request, 'recipeApp/create.html')
 """ def create_recipe(request):
     if not request.user.is_authenticated:
         return render(request, "recipeApp/create.html")  # Show encouragement instead of redirecting
@@ -381,3 +377,97 @@ def about(request):
 
 def contact(request):
     return render(request, 'recipeApp/contact.html')
+
+@login_required
+def my_recipes(request):
+    user_recipes = Recipe.objects.filter(user=request.user)  # Get recipes by the logged-in user
+    return render(request, "recipeApp/my_recipes.html", {"recipes": user_recipes})
+
+@login_required
+def edit_recipe(request, recipe_id):
+    recipe = get_object_or_404(Recipe, id=recipe_id, user=request.user)
+    ingredients = Ingredient.objects.filter(recipe=recipe)
+    instructions = Instruction.objects.filter(recipe=recipe)
+
+    if request.method == "POST":
+        form = RecipeForm(request.POST, request.FILES, instance=recipe)
+
+        if form.is_valid():
+            form.save()
+
+            # ✅ Debugging: Check if form is saving
+            print("✅ Recipe updated successfully!")
+
+            # Handling ingredients
+            ingredient_names = request.POST.getlist("ingredient_name")
+            ingredient_measures = request.POST.getlist("ingredient_measure")
+
+            existing_ingredients = list(ingredients)  # Convert QuerySet to list
+
+            for i in range(len(ingredient_names)):
+                name = ingredient_names[i].strip()
+                measure = ingredient_measures[i].strip()
+
+                if name:
+                    if i < len(existing_ingredients):
+                        # Update existing ingredient
+                        existing_ingredients[i].ingredient_name = name
+                        existing_ingredients[i].measure = measure
+                        existing_ingredients[i].save()
+                    else:
+                        # Add new ingredient
+                        Ingredient.objects.create(recipe=recipe, ingredient_name=name, measure=measure)
+
+            # Remove extra ingredients if any
+            for extra in existing_ingredients[len(ingredient_names):]:
+                extra.delete()
+
+            # Handling instructions
+            instruction_steps = request.POST.getlist("instruction_step")
+            instruction_descriptions = request.POST.getlist("instruction_description")
+
+            existing_instructions = list(instructions)  # Convert QuerySet to list
+
+            for i in range(len(instruction_steps)):
+                step = instruction_steps[i].strip()
+                description = instruction_descriptions[i].strip()
+
+                if description:
+                    if i < len(existing_instructions):
+                        # Update existing instruction
+                        existing_instructions[i].step = step
+                        existing_instructions[i].description = description
+                        existing_instructions[i].save()
+                    else:
+                        # Add new instruction
+                        Instruction.objects.create(recipe=recipe, step=step, description=description)
+
+            # Remove extra instructions if any
+            for extra in existing_instructions[len(instruction_steps):]:
+                extra.delete()
+
+            return redirect("my_recipes")
+
+        else:
+            print("❌ Form is not valid:", form.errors)  # Debugging: Show errors in terminal
+
+    else:
+        form = RecipeForm(instance=recipe)
+
+    return render(request, "recipeApp/edit_recipe.html", {
+    "form": form,
+    "recipe": recipe,  # ✅ Pass the recipe object
+    "ingredients": ingredients,
+    "instructions": instructions
+})
+
+@login_required
+def delete_recipe(request, recipe_id):
+    recipe = get_object_or_404(Recipe, id=recipe_id, user=request.user)
+    
+    if request.method == "POST":
+        recipe.delete()
+        messages.success(request, "Recipe deleted successfully.")
+        return redirect("my_recipes")  # Redirect to the user's recipes page
+    
+    return redirect("my_recipes")  # In case someone tries to access via GET

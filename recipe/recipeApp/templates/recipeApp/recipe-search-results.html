@@ -4,6 +4,25 @@
 <div class="container mt-4">
     <h2 class="text-center mb-4">Search Results for "{{ query }}"</h2>
 
+    <!-- 🔍 Category Filter Form -->
+    <form method="get" action="{% url 'search_recipe' %}" class="form-inline">
+        <!-- Retain the search query -->
+        <input type="hidden" name="q" value="{{ request.GET.q }}">
+        
+        <label for="category" class="mr-2 font-weight-bold">Filter by Category:</label>
+        <select name="category" id="category" onchange="this.form.submit()" class="form-control"
+        style="width: auto; min-width: 180px;">
+            <option value="">All Categories</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}" {% if category.id|stringformat:"s" == request.GET.category %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </form>
+    
+
+
     {% if recipes %}
         {% for recipe in recipes %}
         <div class="row mb-5">
@@ -36,6 +55,15 @@
         <span class="text-muted">No ratings yet.</span>
     {% endif %}
 </p>
+<!-- Category -->
+<p style="color: rgb(12, 12, 12); font-size: .8rem; margin-bottom: 3px; line-height: 1.5;">
+    <strong>Category:</strong>
+    {% if recipe.category %}
+        🏷️ <strong>{{ recipe.category.name }}</strong>
+    {% else %}
+        <span class="text-muted">No category assigned.</span>
+    {% endif %}
+</p>
 
 
                 <!-- Ingredients List with Reduced Width -->
@@ -47,6 +75,27 @@
                         <p class="text-muted">No ingredients listed.</p>
                     {% endfor %}
                 </ul>
+                <!--Video Tutorial-->
+{% if recipe.video_url %}
+{% with recipe.video_url|cut:"https://www.youtube.com/watch?v=" as video_id %}
+    {% with video_id|cut:"https://youtu.be/" as video_id %}
+        {% with video_id|cut:"https://www.youtube.com/embed/" as video_id %}
+            <div class="mt-4 text-center">
+                <h5>Watch Recipe Video 🎥</h5>
+                <div style="position: relative; padding-bottom: 45.25%; height: 0; max-width: 400px; margin: auto;">
+                    <iframe 
+                        src="https://www.youtube.com/embed/{{ video_id }}"
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 12px;"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+        {% endwith %}
+    {% endwith %}
+{% endwith %}
+{% endif %}
 
                 <!-- View/Add Comments and Favorite Button Below Ingredients -->
                 <div class="text-center mt-3">

@@ -3,7 +3,7 @@
 {% block content %}
 <button onclick="history.back()" 
         style="border: none;
-                left: 1cm; 
+               left: 1cm; 
                background: none; 
                font-size: 1.5rem; 
                cursor: pointer;">
@@ -14,6 +14,22 @@
     <h2 class="mb-4 text-center">Your Favorite Recipes</h2>
 
     {% if user.is_authenticated %}
+        <!-- ✅ Filter form (moved above the recipe loop) -->
+        <form method="get" action="{% url 'favorites' %}" class="form-inline">
+            <label for="category" class="mr-2 font-weight-bold">Filter by Category:</label>
+            <select name="category" id="category"
+                    onchange="this.form.submit()"
+                    class="form-control"
+                    style="width: auto; min-width: 180px;">
+                <option value="">All Categories</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}" {% if category.id == selected_category %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+
         {% if favorite_recipes %}
             <div class="row">
                 {% for recipe in favorite_recipes %}

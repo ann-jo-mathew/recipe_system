@@ -13,18 +13,28 @@ class Timestamp(models.Model):
         abstract = True  # This ensures it doesn't create a separate table in the database
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Recipe(Timestamp):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     recipe_name = models.CharField(max_length=255)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
     image = models.ImageField(upload_to='recipe_images/', null=True, blank=True)
     time_needed = models.CharField(max_length=50, default="Not specified")
-    serving_portion = models.CharField(max_length=50, default="1 serving") 
+    serving_portion = models.CharField(max_length=50, default="1 serving")
+    video_url = models.URLField(blank=True, null=True)
 
     class Meta:
-        unique_together = ('user', 'recipe_name') 
-        
+        unique_together = ('user', 'recipe_name')
+
     def __str__(self):
         return self.recipe_name
+
 
 """ class Ingredient(Timestamp):
     ingredient_name = models.CharField(max_length=255)

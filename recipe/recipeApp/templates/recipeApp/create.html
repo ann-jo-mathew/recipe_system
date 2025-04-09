@@ -27,7 +27,17 @@
                 <label for="image">Upload Image:</label>
                 <input type="file" class="form-control-file" id="image" name="image">
             </div>
-
+            <!-- Add category manually -->
+            <div class="form-group">
+                <label for="category">Category:</label>
+                <select name="category" id="category" class="form-control">
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" {% if recipe.category.id == category.id %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
             <!-- Ingredients Section -->
             <div class="form-group">
                 <label>Ingredients:</label>
@@ -50,6 +60,31 @@
                 </div>
                 <input type="hidden" name="instructions" id="instructions_input">
             </div>
+            <div class="form-group mt-3">
+                <label for="video_url">YouTube/Video Tutorial Link (Optional):</label>
+                <input type="url" class="form-control" name="video_url" id="video_url" placeholder="https://www.youtube.com/watch?v=xyz123">
+            </div>
+            <!--Video Tutorial-->
+{% if recipe.video_url %}
+{% with recipe.video_url|cut:"https://www.youtube.com/watch?v=" as video_id %}
+    {% with video_id|cut:"https://youtu.be/" as video_id %}
+        {% with video_id|cut:"https://www.youtube.com/embed/" as video_id %}
+            <div class="mt-4 text-center">
+                <h5>Watch Recipe Video 🎥</h5>
+                <div style="position: relative; padding-bottom: 15.25%; height: 0; max-width: 250px; margin: auto;">
+                    <iframe 
+                        src="https://www.youtube.com/embed/{{ video_id }}"
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 12px;"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+        {% endwith %}
+    {% endwith %}
+{% endwith %}
+{% endif %}
 
             <button type="submit" class="btn btn-success mt-3">Submit Recipe</button>
         </form>

@@ -34,7 +34,15 @@
     {% endif %}
 </p>
 
-
+<!-- Category -->
+<p style="color: rgb(12, 12, 12); font-size: .8rem; margin-bottom: 3px; line-height: 1.5;">
+    <strong>Category:</strong>
+    {% if recipe.category %}
+        🏷️ <strong>{{ recipe.category.name }}</strong>
+    {% else %}
+        <span class="text-muted">No category assigned.</span>
+    {% endif %}
+</p>
             <!-- Ingredients List with Reduced Width -->
             <h3 class="mt-4">Ingredients</h3>
             <ul class="list-group" style="max-width: 75%;">
@@ -44,6 +52,29 @@
                     <p class="text-muted">No ingredients listed.</p>
                 {% endfor %}
             </ul>
+
+            <!--Video Tutorial-->
+{% if recipe.video_url %}
+    {% with recipe.video_url|cut:"https://www.youtube.com/watch?v=" as video_id %}
+        {% with video_id|cut:"https://youtu.be/" as video_id %}
+            {% with video_id|cut:"https://www.youtube.com/embed/" as video_id %}
+                <div class="mt-4 text-center">
+                    <h5>Watch Recipe Video 🎥</h5>
+                    <div style="position: relative; padding-bottom: 45.25%; height: 0; max-width: 400px; margin: auto;">
+                        <iframe 
+                            src="https://www.youtube.com/embed/{{ video_id }}"
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 12px;"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            {% endwith %}
+        {% endwith %}
+    {% endwith %}
+{% endif %}
+
 
             <!-- View/Add Comments and Favorite Button Below Ingredients -->
             <div class="text-center mt-3">

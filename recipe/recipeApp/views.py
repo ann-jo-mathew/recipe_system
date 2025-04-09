@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Recipe, Ingredient, Instruction, Rating, Favorite, UserProfile
+from .models import Recipe, Ingredient, Instruction, Rating, Favorite, UserProfile, Category
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout, get_user_model
 # Rename to avoid conflict
@@ -73,19 +73,19 @@ def login_user(request):
 
 @login_required
 def user_profile(request):
-    profile, created = UserProfile.objects.get_or_create(user=request.user)  # Ensures profile exists
-    
+    profile, created = UserProfile.objects.get_or_create(user=request.user)  # Ensure profile exists
+
     if request.method == "POST":
         form = UserProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
-            form.save()
-            return redirect('user_profile')  # Reload the same page after saving
+            form.save()  # This will update the User model as well
+            return redirect('user_profile')
 
     else:
         form = UserProfileForm(instance=profile)
 
     return render(request, 'recipeApp/user_profile.html', {'profile': profile, 'form': form})
-
+    
 # Logout View
 def logout_user(request):
     auth_logout(request)
@@ -130,23 +130,36 @@ def recipe_detail(request, recipe_name):
     print(latest_recipes)  
     return render(request, 'recipeApp/latest_recipes.html', {'latest_recipes': latest_recipes})"""
 
-def search_recipe(request):
-    query = request.GET.get('q', '')  # Get the search query from the URL
-    recipes = Recipe.objects.filter(recipe_name__icontains=query)if query else []  # Case-insensitive search
 
+def search_recipe(request):
+    query = request.GET.get('q', '')
+    category_id = request.GET.get('category', '')
+
+    recipes = Recipe.objects.all()
+
+    if query:
+        recipes = recipes.filter(recipe_name__icontains=query)
+
+    if category_id:
+        recipes = recipes.filter(category__id=category_id)
+
+    # Annotate each recipe with additional information
     for recipe in recipes:
-        # Fetch ingredients and instructions for each recipe
         recipe.ingredients = Ingredient.objects.filter(recipe=recipe)
         recipe.instructions = Instruction.objects.filter(recipe=recipe).order_by('step_no')
         ratings = Rating.objects.filter(recipe=recipe)
+        recipe.average_rating = sum(r.rating for r in ratings) / ratings.count() if ratings.exists() else 0
 
-        # Calculate average rating
-        if ratings.exists():
-            recipe.average_rating = sum(r.rating for r in ratings) / ratings.count()
-        else:
-            recipe.average_rating = 0  # Default to 0 if no ratings
+    categories = Category.objects.all()
 
-    return render(request, 'recipeApp/recipe-search-results.html', {'recipes': recipes, 'query': query})
+    return render(request, 'recipeApp/recipe-search-results.html', {
+        'recipes': recipes,
+        'query': query,
+        'categories': categories,
+        'selected_category': category_id,
+    })
+
+
 
 def about(request):
     return render(request, 'recipeApp/about.html')
@@ -257,39 +270,53 @@ def create_recipe(request):
         time_needed = request.POST.get('time_needed')
         serving_portion = request.POST.get('serving_portion')
         image = request.FILES.get('image')
+        category_id = request.POST.get('category')  # ✅ Get selected category ID
+        video_url = request.POST.get('video_url', '')
+
 
         # ✅ Check if the recipe name already exists for this user
         if Recipe.objects.filter(user=request.user, recipe_name=recipe_name).exists():
             messages.error(request, "You already have a recipe with this name. Please choose a different name.")
-            return render(request, 'recipeApp/create.html')
+            return render(request, 'recipeApp/create.html', {'categories': Category.objects.all()})
 
-        # ✅ Create the recipe
+        # ✅ Get the Category object (optional fallback to None)
+        category = None
+        if category_id:
+            try:
+                category = Category.objects.get(id=category_id)
+            except Category.DoesNotExist:
+                messages.error(request, "Selected category does not exist.")
+                return render(request, 'recipeApp/create.html', {'categories': Category.objects.all()})
+
+        # ✅ Create the recipe with category
         recipe = Recipe.objects.create(
             user=request.user,
             recipe_name=recipe_name,
             time_needed=time_needed,
             serving_portion=serving_portion,
-            image=image
+            image=image,
+            category=category,  # ✅ Set category
+            video_url=video_url
         )
 
-        # ✅ Get ingredients and instructions
-        ingredients_raw = request.POST.get('ingredients', '').split("\n")
-        instructions_raw = request.POST.get('instructions', '').split("\n")
-
         # ✅ Save ingredients
+        ingredients_raw = request.POST.get('ingredients', '').split("\n")
         for ingredient in ingredients_raw:
             if " - " in ingredient:
                 name, measure = ingredient.split(" - ")
                 Ingredient.objects.create(recipe=recipe, ingredient_name=name.strip(), measure=measure.strip())
 
         # ✅ Save instructions
+        instructions_raw = request.POST.get('instructions', '').split("\n")
         for step_no, instruction in enumerate(instructions_raw, start=1):
             Instruction.objects.create(recipe=recipe, step_no=step_no, description=instruction.strip())
 
         messages.success(request, "Recipe created successfully!")
         return redirect('index')
 
-    return render(request, 'recipeApp/create.html')
+    # ✅ Pass categories to the template for the form
+    return render(request, 'recipeApp/create.html', {'categories': Category.objects.all()})
+
 """ def create_recipe(request):
     if not request.user.is_authenticated:
         return render(request, "recipeApp/create.html")  # Show encouragement instead of redirecting
@@ -352,25 +379,49 @@ def favorite_recipe(request, recipe_id):
             # If already favorited, remove from favorites
             favorite.delete()
 
-        return redirect('recipe_detail', recipe_name=recipe.recipe_name)  # Redirect to recipe detail if logged in
+        return redirect('recipe_detail', recipe_name=recipe.recipe_name)
     else:
-        return redirect('favorites')  # Redirect to favorites page if not logged in
+        return redirect('favorites')
+
 
 def favorites(request):
+    selected_category = request.GET.get("category")
     favorite_recipes = Recipe.objects.filter(favorite__user=request.user) if request.user.is_authenticated else None
-    return render(request, 'recipeApp/favorites.html', {'favorite_recipes': favorite_recipes})
-  
-def recipe_list(request):    
-    recipes = Recipe.objects.all().annotate(avg_rating=Avg('rating__rating')).order_by('-created_at')
-    # Convert avg_rating to full_stars and empty_stars
+    categories = Category.objects.all()
+
+    if selected_category:
+        favorite_recipes = favorite_recipes.filter(category__id=selected_category)
+
+    return render(request, 'recipeApp/favorites.html', {
+        'favorite_recipes': favorite_recipes,
+        'categories': categories,
+        'selected_category': int(selected_category) if selected_category else None
+    })
+
+def recipe_list(request):
+    category_id = request.GET.get('category')  # Fetch the selected category from URL
+    recipes = Recipe.objects.all().annotate(avg_rating=Avg('rating__rating'))
+
+    if category_id:
+        recipes = recipes.filter(category__id=category_id)
+
+    recipes = recipes.order_by('-created_at')  # Show latest recipes first
+
     for recipe in recipes:
         recipe.full_stars = int(recipe.avg_rating) if recipe.avg_rating else 0
         recipe.empty_stars = 5 - recipe.full_stars
 
-    paginator = Paginator(recipes, 9)  
-    page_number = request.GET.get('page')  
-    recipes = paginator.get_page(page_number) 
-    return render(request, 'recipeApp/recipes.html', {'recipes': recipes})
+    paginator = Paginator(recipes, 9)
+    page_number = request.GET.get('page')
+    recipes = paginator.get_page(page_number)
+
+    categories = Category.objects.all()  # Fetch all categories for the dropdown/filter
+
+    return render(request, 'recipeApp/recipes.html', {
+        'recipes': recipes,
+        'categories': categories,
+        'selected_category': int(category_id) if category_id else None
+    })
 
 def about(request):
     return render(request, 'recipeApp/about.html')
@@ -386,6 +437,7 @@ def my_recipes(request):
 @login_required
 def edit_recipe(request, recipe_id):
     recipe = get_object_or_404(Recipe, id=recipe_id, user=request.user)
+    categories = Category.objects.all()
     ingredients = Ingredient.objects.filter(recipe=recipe)
     instructions = Instruction.objects.filter(recipe=recipe)
 
@@ -395,8 +447,19 @@ def edit_recipe(request, recipe_id):
         if form.is_valid():
             form.save()
 
+            # ✅ Save the selected category
+            category_id = request.POST.get("category")
+            if category_id:
+                recipe.category = Category.objects.get(id=category_id)
+                recipe.save()
+
             # ✅ Debugging: Check if form is saving
             print("✅ Recipe updated successfully!")
+
+            # ✅ Update the video URL
+            updated_recipe.video_url = request.POST.get("video_url", "")
+
+            updated_recipe.save()
 
             # Handling ingredients
             ingredient_names = request.POST.getlist("ingredient_name")
@@ -458,7 +521,8 @@ def edit_recipe(request, recipe_id):
     "form": form,
     "recipe": recipe,  # ✅ Pass the recipe object
     "ingredients": ingredients,
-    "instructions": instructions
+    'categories': categories,
+    "instructions": instructions,
 })
 
 @login_required
